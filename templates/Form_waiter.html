@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Waiter</title>
+</head>
+<body>
+{% extends "base.html" %}
+<div>
+    {% block content %}
+    <form method="POST">
+        <h1>Form - Registry</h1>
+        <h3>Name: <input type="text" name="Name" placeholder="Dvir"> </h3>
+        <h3>Role: <input type="text" name="Job" placeholder="waiter"> </h3>
+        <h3>Age: <input type="text" name="Age" placeholder="22"> </h3>
+        <h3>Phone: <input type="text" name="Phone" placeholder="0521234567"> </h3>
+        <h3>Location: <input type="text" name="Location" placeholder="modiin"> </h3>
+        <h3><input type="submit" name="Submit" value="Submit"></h3>
+        <br>
+        <h4>{{waiters}}</h4>
+    </form>
+    {% endblock %}
+    </div>
+</body>
+</html>

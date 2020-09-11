@@ -1,0 +1,28 @@
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }} - Jems</title>
+        {% else %}
+        <title>Jems tips</title>
+        {% endif %}
+    </head>
+    <body>
+        <div>
+            Jems:
+            <a href="{{url_for('jems_beer')}}">Home</a>
+            <a href="{{url_for('form_new_waiter')}}">Add New Waiter</a>
+<!--            <a href="/login">Login</a>-->
+        </div>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </body>
+</html>
