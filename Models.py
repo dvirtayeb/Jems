@@ -1,11 +1,30 @@
 from django.db.models.expressions import Col
 
 import Program
+from Program import db
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time, Float
 
 
 # model for db:
-class Waiters(Program.db.Model):
+class BaseModel(db.Model):
+    __abstract__ = True
+    
+    def save(self):
+        if self not in db.session:
+            db.session.add(self)
+        db.session.commit()
+
+    def update(self, data: dict):
+        for field, value in data.items():
+            setattr(self, field, value)
+        self.save()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+
+class Waiters(db.Model):
     __table_name__ = 'waiters'
     waiter_name = Column('Name', String(20), nullable=True, primary_key=True)
     job_name = Column('Job_Name', String(20), nullable=True)
@@ -21,7 +40,7 @@ class Waiters(Program.db.Model):
         self.location = location
 
 
-class Money(Program.db.Model):
+class Money(db.Model):
     __table_name__ = 'money'
     id = Column('id', Integer, primary_key=True)
     total_hours = Column('Total - Hours', Float, nullable=True)
@@ -40,7 +59,7 @@ class Money(Program.db.Model):
         self.total_tip = total_tip
 
 
-class WaitersTable(Program.db.Model):
+class WaitersTable(db.Model):
     __table_name__ = 'waiters_table'
     id_waiter = Column('id', Integer, primary_key=True)
     name = Column('Name', String, nullable=True)
