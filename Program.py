@@ -13,9 +13,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY') or '076f2ce915e884096c9ae907479b316e'
 app.config['SECRET_KEY'] = SECRET_KEY
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}\\dataBase\\jems_db.db'.format(os.getcwd())  # db file
-print(app.config['SQLALCHEMY_DATABASE_URI'])
 db = SQLAlchemy(app)  # Database
 migrate = Migrate(app, db)
+print(app.config['SQLALCHEMY_DATABASE_URI'])
 
 
 @app.route('/form_waiter1/', methods=['GET', 'POST'])
@@ -114,13 +114,20 @@ def jems_beer_update():
                 Models.WaitersTable.all_tip.append('')
 
         # send to db (database,"DB Browser (SQLite)"):
-        for x in range(len(Models.WaitersTable.waiters_name)):
+        day_tip = [Models.Money(total_hours=total_hours, total_cash=Models.Money.total_cash,
+                                total_credit=Models.Money.total_credit, cash_per_hour=Models.Money.cash_per_hour
+                                , credit_per_hour=Models.Money.credit_per_hour, total_tip=Models.Money.total_tip)]
+        for money in day_tip:
+            db.session.add(money)
+        db.session.commit()
+        for x in range(len(Models.WaitersTable.waiters_name)):  # O(n^2)
             if Models.WaitersTable.waiters_name != '':
                 waiter = \
-                    [Models.WaitersTable(name=Models.WaitersTable.name[x], start_time_waiter=datetime.strptime(
-                        Models.WaitersTable.start_time_waiter[x], "%H:%M").time(),
-                                         finish_time_waiters=datetime.strptime(
-                                             Models.WaitersTable.finish_time_waiter[x], "%H:%M").time(),
+                    [Models.WaitersTable(id_waiter=x, name=Models.WaitersTable.name[x],
+                                         start_time_waiter=datetime.strptime(Models.WaitersTable.start_time_waiter[x]
+                                                                             , "%H:%M").time(),
+                                         finish_time_waiters=datetime.strptime(Models.WaitersTable.finish_time_waiter[x]
+                                                                               , "%H:%M").time(),
                                          total_waiter_time=Models.WaitersTable.total_waiter_time[x],
                                          total_cash_waiter=Models.WaitersTable.cash[x],
                                          total_credit_waiter=Models.WaitersTable.credit[x],
@@ -128,8 +135,9 @@ def jems_beer_update():
                      ]
                 Models.WaitersTable.waiters.append(waiter)
                 print("the output is: ", waiter)
-                # db.session.add(Models.WaitersTable.waiters[x])
-
+                for w in waiter:
+                    db.session.add(w)
+        db.session.commit()
     # send to html:
     return render_template('Jems-tips1.html',
                            total_hours=total_hours,

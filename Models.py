@@ -22,8 +22,8 @@ class Waiters(Program.db.Model):
 
 
 class Money(Program.db.Model):
-    __table_name__ = 'Money'
-    id = Column(Integer, primary_key=True)
+    __table_name__ = 'money'
+    id = Column('id', Integer, primary_key=True)
     total_hours = Column('Total - Hours', Float, nullable=True)
     total_cash = Column('Total - Cash', Float, nullable=True)
     total_credit = Column('Total - Credit', Float, nullable=True)
@@ -41,9 +41,9 @@ class Money(Program.db.Model):
 
 
 class WaitersTable(Program.db.Model):
-    __table_name__ = 'waiters_t'
-    id = Column(Integer, primary_key=True)
-    name = Column('Name', )
+    __table_name__ = 'waiters_table'
+    id_waiter = Column('id', Integer, primary_key=True)
+    name = Column('Name', String, nullable=True)
     start_time_waiter = Column('Start-time', Time or Float, nullable=True)
     finish_time_waiter = Column('Finish-time', Time or Float, nullable=True)
     total_waiter_time = Column('Hours', Float, nullable=True)
@@ -56,8 +56,9 @@ class WaitersTable(Program.db.Model):
     credit = []
     all_tip = []
 
-    def __init__(self, name, start_time_waiter, finish_time_waiters, total_waiter_time, total_cash_waiter,
+    def __init__(self, id_waiter, name, start_time_waiter, finish_time_waiters, total_waiter_time, total_cash_waiter,
                  total_credit_waiter, total_tip_waiter):
+        self.id_waiter = id_waiter
         self.name = name
         self.start_time_waiter = start_time_waiter
         self.finish_time_waiters = finish_time_waiters
