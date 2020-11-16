@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from django.db.models.expressions import Col
 
 import Program
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time, Float
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time, Float, Date
 
 
 # model for db:
@@ -41,7 +43,7 @@ class Waiters(Program.db.Model):
 
 class Money(Program.db.Model):
     __table_name__ = 'money'
-    id = Column('id', Integer, primary_key=True)
+    id = Column('id_money', Integer, primary_key=True)
     total_hours = Column('Total - Hours', Float, nullable=True)
     total_cash = Column('Total - Cash', Float, nullable=True)
     total_credit = Column('Total - Credit', Float, nullable=True)
@@ -57,37 +59,145 @@ class Money(Program.db.Model):
         self.credit_per_hour = credit_per_hour
         self.total_tip = total_tip
 
+    def sum_total_hours(self, hour):
+        self.total_hours = self.total_hours + int(float(hour))
+
+    def get_total_hours(self):
+        return self.total_hours
+
+    def set_total_hours(self, hours):
+        self.total_hours = self.total_hours + hours
+
+    def set_total_cash_shift(self):
+        if self.total_cash != '':
+            self.total_cash = float(self.total_cash)
+        else:
+            self.total_cash = 0
+
+    def set_total_credit_shift(self):
+        if self.total_credit != '':
+            self.total_credit = float(self.total_credit)
+        else:
+            self.total_credit = 0
+
+    def set_total_tips(self):
+        self.total_tip = self.cash_per_hour + self.credit_per_hour
+
+    def calculate_cash_per_hour(self):
+        self.cash_per_hour = round(float(self.total_cash) / self.total_hours, 1)
+
+    def calculate_credit_per_hour(self):
+        self.credit_per_hour = round(float(self.total_credit) / self.total_hours, 2)
+
+    def __repr__(self):
+        return 'total hours: {}, total cash: {}, total_credit: {}, cash_per_hour: {}, credit_per_hour: {},' \
+               ' total_tip: {} '\
+            .format(self.total_hours, self.total_cash, self.total_credit, self.cash_per_hour, self.credit_per_hour,
+                    self.total_tip)
+
+
+    def __repr__(self):
+        pass
+
 
 class WaitersTable(Program.db.Model):
     __table_name__ = 'waiters_table'
-    id_waiter = Column('id', Integer, primary_key=True)
+    id_waiter = Column('id', Integer, primary_key=True, nullable=True)
     name = Column('Name', String, nullable=True)
-    start_time_waiter = Column('Start-time', Time or Float, nullable=True)
-    finish_time_waiter = Column('Finish-time', Time or Float, nullable=True)
+    start_time_waiter = Column('Start-time', Time or Date, nullable=True)
+    finish_time_waiter = Column('Finish-time', Time or Date, nullable=True)
     total_waiter_time = Column('Hours', Float, nullable=True)
     total_cash_waiter = Column('T-Cash-waiter', Float, nullable=True)
     total_credit_waiter = Column('T-Credit-waiter', Float, nullable=True)
     total_tip_waiter = Column('Total-money', Float, nullable=True)
-    waiters_name = []
     waiters = []
-    cash = []
-    credit = []
-    all_tip = []
+    waiters_name = []
+    start_time_waiter_list = []
+    finish_time_waiter_list = []
+    total_waiter_time_list = []
+    cash_waiter_list = []
+    credit_waiter_list = []
+    all_tips_waiters_list = []
 
-    def __init__(self, id_waiter, name, start_time_waiter, finish_time_waiters, total_waiter_time, total_cash_waiter,
+    def __init__(self, id_waiter, name, start_time_waiter, finish_time_waiter, total_waiter_time, total_cash_waiter,
                  total_credit_waiter, total_tip_waiter):
         self.id_waiter = id_waiter
         self.name = name
         self.start_time_waiter = start_time_waiter
-        self.finish_time_waiters = finish_time_waiters
+        self.finish_time_waiter = finish_time_waiter
         self.total_waiter_time = total_waiter_time
         self.total_cash_waiter = total_cash_waiter
         self.total_credit_waiter = total_credit_waiter
         self.total_tip_waiter = total_tip_waiter
 
+    def get_name(self):
+        return self.name
+
+    def get_start_time_waiter(self):
+        return self.start_time_waiter
+
+    def get_finish_time_waiter(self):
+        return self.finish_time_waiter
+
+    def get_total_waiter_time(self):
+        return self.total_waiter_time
+
+    def get_total_cash_waiter(self):
+        return self.total_cash_waiter
+
+    def get_total_credit_waiter(self):
+        return self.total_credit_waiter
+
+    def get_total_tip_waiter(self):
+        return self.total_tip_waiter
+
+    def set_start_time_zero(self):
+        time_zero = datetime(1, 1, 1).time()
+        if self.start_time_waiter == '':
+            pass
+        self.start_time_waiter = time_zero
+
+    def set_finish_time_zero(self):
+        time_zero = datetime(1, 1, 1).time()
+        if self.finish_time_waiter == '':
+            self.finish_time_waiter = time_zero
+
+    def set_total_time_waiter_zero(self):
+        if self.total_waiter_time == '':
+            self.total_waiter_time = 0
+
+    def add_to_list_start_time(self):
+        if self.start_time_waiter != '':
+            self.start_time_waiter_list.append(self.start_time_waiter)
+
+    def add_to_list_finish_time(self):
+        if self.finish_time_waiter != '':
+            self.finish_time_waiter_list.append(self.finish_time_waiter)
+
+    def add_to_list_total_waiter(self):
+        if self.total_waiter_time != '':
+            self.total_waiter_time_list.append(self.total_waiter_time)
+
+    def add_to_list_name(self):
+        if self.name != '':
+            self.waiters_name.append(self.name)
+
+    def calculate_tip_each_waiter(self, money):
+        if self.total_waiter_time != 0:
+            self.total_cash_waiter = round(float(self.total_waiter_time) * float(money.cash_per_hour), 1)
+            self.cash_waiter_list.append(self.total_cash_waiter)
+            self.total_credit_waiter = round(float(self.total_waiter_time) * float(money.credit_per_hour), 2)
+            self.credit_waiter_list.append(self.total_credit_waiter)
+            self.total_tip_waiter = round(float(self.total_cash_waiter) + float(self.total_credit_waiter), 2)
+            self.all_tips_waiters_list.append(self.total_tip_waiter)
+        else:
+            self.cash_waiter_list.append('')
+            self.credit_waiter_list.append('')
+            self.all_tips_waiters_list.append('')
+
     # "to String":
     def __repr__(self):
-        return '<waiters: name: {}, start time: {}, end time: {}, total time: {},' \
-               ' total cash: {}, total credit:{}, total tip:{}'\
-            .format(self.name, self.start_time_waiter, self.finish_time_waiters,
+        return '<waiters:id:{}, name: {}, start time: {}, end time: {}, total time: {},' \
+               ' total cash waiter: {}, total credit waiter:{}, total tip:{}\n'\
+            .format(self.id_waiter, self.name, self.start_time_waiter, self.finish_time_waiter,
                     self.total_waiter_time, self.total_cash_waiter, self.total_credit_waiter, self.total_tip_waiter)
