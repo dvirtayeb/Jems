@@ -59,8 +59,8 @@ class Money(Program.db.Model):
         self.credit_per_hour = credit_per_hour
         self.total_tip = total_tip
 
-    def sum_total_hours(self, hour):
-        self.total_hours = self.total_hours + int(float(hour))
+    def sum_total_hours(self, waiter):
+        self.total_hours = self.total_hours + float(waiter.total_waiter_time)
 
     def get_total_hours(self):
         return self.total_hours
@@ -89,6 +89,14 @@ class Money(Program.db.Model):
     def calculate_credit_per_hour(self):
         self.credit_per_hour = round(float(self.total_credit) / self.total_hours, 2)
 
+    def init_money(self):
+        self.set_total_cash_shift()
+        self.set_total_credit_shift()
+
+    def calculate_money(self):
+        self.calculate_cash_per_hour()
+        self.calculate_credit_per_hour()
+
     def __repr__(self):
         return 'total hours: {}, total cash: {}, total_credit: {}, cash_per_hour: {}, credit_per_hour: {},' \
                ' total_tip: {} '\
@@ -104,12 +112,13 @@ class WaitersTable(Program.db.Model):
     __table_name__ = 'waiters_table'
     id_waiter = Column('id', Integer, primary_key=True, nullable=True)
     name = Column('Name', String, nullable=True)
-    start_time_waiter = Column('Start-time', Time or Date, nullable=True)
-    finish_time_waiter = Column('Finish-time', Time or Date, nullable=True)
+    start_time_waiter = Column('Start-time', Time, nullable=True)
+    finish_time_waiter = Column('Finish-time', Time, nullable=True)
     total_waiter_time = Column('Hours', Float, nullable=True)
     total_cash_waiter = Column('T-Cash-waiter', Float, nullable=True)
     total_credit_waiter = Column('T-Credit-waiter', Float, nullable=True)
     total_tip_waiter = Column('Total-money', Float, nullable=True)
+    time_zero = datetime(1, 1, 1).time()
     waiters = []
     waiters_name = []
     start_time_waiter_list = []
@@ -152,15 +161,13 @@ class WaitersTable(Program.db.Model):
         return self.total_tip_waiter
 
     def set_start_time_zero(self):
-        time_zero = datetime(1, 1, 1).time()
         if self.start_time_waiter == '':
             pass
-        self.start_time_waiter = time_zero
+        self.start_time_waiter = self.time_zero
 
     def set_finish_time_zero(self):
-        time_zero = datetime(1, 1, 1).time()
         if self.finish_time_waiter == '':
-            self.finish_time_waiter = time_zero
+            self.finish_time_waiter = self.time_zero
 
     def set_total_time_waiter_zero(self):
         if self.total_waiter_time == '':
@@ -194,6 +201,17 @@ class WaitersTable(Program.db.Model):
             self.cash_waiter_list.append('')
             self.credit_waiter_list.append('')
             self.all_tips_waiters_list.append('')
+
+    def init_waiter(self, waiter, money):
+        self.set_start_time_zero()
+        self.set_finish_time_zero()
+        self.set_total_time_waiter_zero()
+        money.sum_total_hours(waiter)
+        self.add_to_list_name()
+        self.add_to_list_start_time()
+        self.add_to_list_finish_time()
+        self.add_to_list_total_waiter()
+        self.waiters.append(waiter)
 
     # "to String":
     def __repr__(self):

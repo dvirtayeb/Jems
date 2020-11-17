@@ -4,12 +4,13 @@
   }
 
 .header {
-    background: url(logo_home.png) left ;
-    background-size: 20px, 25px, cover;
+    background: url(logo_home.png) center ;
+    background-size: contain;
+    background-repeat: no-repeat;
     background-color: rgba(1, 173, 130, 0.911);
-    padding: 15px;
-    text-align: center;
-    -webkit-text-fill-color: white
+    width: 64%;
+    padding: 30px;
+    -webkit-text-fill-color: white;
 }
 .button {
     background-color: rgb(0, 141, 94);
@@ -30,7 +31,8 @@
     text-align: center;
 }
 table{
-    border-collapse:collapse
+    border-collapse:collapse;
+    box-sizing: border-box;
 }
 table, td, th {
     border: 2px solid black;
@@ -51,7 +53,6 @@ table, td, th {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    /* width: 10% */;
     overflow: hidden;
     background-color: #333333;
     width: 64%
@@ -110,3 +111,4 @@ table, td, th {
 .disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}

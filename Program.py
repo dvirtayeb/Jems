@@ -31,19 +31,21 @@ def about():
 
 @app.route('/')
 def jems_beer():
-    # total_hours = 0
-    Models.Money.total_cash = 0
-    Models.Money.total_credit = 0
-    Models.Money.cash_per_hour = ''
-    Models.Money.credit_per_hour = ''
-    Models.Money.total_tip = ''
-    Models.WaitersTable.name = []
-    Models.WaitersTable.total_waiter_time = []
-    Models.WaitersTable.start_time_waiter = []
-    Models.WaitersTable.finish_time_waiter = []
-    Models.WaitersTable.cash_waiter_list = []
-    Models.WaitersTable.credit_waiter_list = []
-    Models.WaitersTable.all_tips_waiters_list = []
+    waiter = Models.WaitersTable
+    money = Models.Money
+    time_zero = datetime(1, 1, 1).time()
+    money.total_cash = 0
+    money.total_credit = 0
+    money.cash_per_hour = ''
+    money.credit_per_hour = ''
+    money.total_tip = ''
+    waiter.name = ''
+    waiter.total_waiter_time = 0
+    waiter.start_time_waiter = time_zero
+    waiter.finish_time_waiter = time_zero
+    waiter.cash_waiter_list = []
+    waiter.credit_waiter_list = []
+    waiter.all_tips_waiters_list = []
     return render_template("jems-tips1.html", waiters=[],
                            name='',
                            start_time='',
@@ -56,7 +58,6 @@ def jems_beer():
 
 @app.route('/', methods=['POST', 'GET'])
 def jems_beer_update():
-    counter = 0
     waiter = Models.WaitersTable
     money = Models.Money
     if request.method == 'POST':
@@ -73,32 +74,17 @@ def jems_beer_update():
         cash_per_hour = 0
         credit_per_hour = 0
         total_tip = 0
-        # Objects:
+
         money = Models.Money(total_hours, total_cash, total_credit, cash_per_hour, credit_per_hour, total_tip)
-        # Set the total cash, total credit:
-        money.set_total_cash_shift()
-        money.set_total_credit_shift()
+        money.init_money()
         for i in range(len(names)):
-            counter = counter + 1
-            waiter = Models.WaitersTable(counter, names[i], start_time_waiter[i], finish_time_waiter[i],
+            waiter = Models.WaitersTable(i+1, names[i], start_time_waiter[i], finish_time_waiter[i],
                                          total_waiter_time[i], total_cash_waiter, total_credit_waiter, total_tip_waiter)
-            # check for all waiters if we got time and set the time to 00:00 if not:
-            waiter.set_start_time_zero()
-            waiter.set_finish_time_zero()
-            # set hour time to 0 if we don't have it from the user
-            waiter.set_total_time_waiter_zero()
-            money.sum_total_hours(waiter.total_waiter_time)
-            # arrayList of Waiters name:
-            waiter.add_to_list_name()
-            waiter.add_to_list_start_time()
-            waiter.add_to_list_finish_time()
-            waiter.add_to_list_total_waiter()
-            waiter.waiters.append(waiter)
+            waiter.init_waiter(waiter, money)
 
         # Calculate the cash per hour, credit per hour, total tip:
         if money.total_hours > 0:
-            money.calculate_cash_per_hour()
-            money.calculate_credit_per_hour()
+            money.calculate_money()
         money.total_tip = money.cash_per_hour + money.credit_per_hour
         # Calculate the cash and credit for each waiter:
         for i in range(len(names)):
@@ -112,7 +98,6 @@ def jems_beer_update():
         db.session.commit()
         # print(waiters)
         for waiter in waiter.waiters:
-            print(waiter)
             if waiter.name != '':
                 db.session.add(waiter)
             db.session.commit()
