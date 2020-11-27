@@ -5,4 +5,4 @@ and i tried to change the process to be more easy
 * Calculate tips for all the waiters in my restaurant.
 * for to refresh click on the buttom "Home"
 
-![tips](https://github.com/dvirtayeb/Jems/blob/master/example_tips.png)
+![example_tips](https://github.com/dvirtayeb/Jems/blob/master/example_tips.png)
