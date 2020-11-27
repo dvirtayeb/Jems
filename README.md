@@ -6,4 +6,4 @@ and i tried to change the process to be more easy
 * for to refresh click on the buttom "Home"
 
 
-![example_tips2](https://github.com/dvirtayeb/Jems/blob/master/example_tips2.png)
+![example_tips3](https://github.com/dvirtayeb/Jems/blob/master/example_tips3.png)
