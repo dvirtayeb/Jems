@@ -189,11 +189,11 @@ class WaitersTable(Program.db.Model):
         if self.name != '':
             self.waiters_name.append(self.name)
 
-    def calculate_tip_each_waiter(self, money):
+    def calculate_tip_each_waiter(self, shift):
         if self.total_waiter_time != 0:
-            self.total_cash_waiter = round(float(self.total_waiter_time) * float(money.cash_per_hour), 1)
+            self.total_cash_waiter = round(float(self.total_waiter_time) * float(shift.cash_per_hour), 1)
             self.cash_waiter_list.append(self.total_cash_waiter)
-            self.total_credit_waiter = round(float(self.total_waiter_time) * float(money.credit_per_hour), 2)
+            self.total_credit_waiter = round(float(self.total_waiter_time) * float(shift.credit_per_hour), 2)
             self.credit_waiter_list.append(self.total_credit_waiter)
             self.total_tip_waiter = round(float(self.total_cash_waiter) + float(self.total_credit_waiter), 2)
             self.all_tips_waiters_list.append(self.total_tip_waiter)

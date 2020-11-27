@@ -10,50 +10,16 @@
     {% extends "base.html" %}
     {% block content %}
         <div class="home">
-        <!--years--><div>
-            <ul>
-                <li><a href="#"> 2019</a></li>
-                <li><a href="#"> +</a></li>
-            </ul>
-        </div>
-        <br>
-        <!--months--><div>
-            <ul>
-                <li class="dropdown">
-                    <a href="#" class="droptbn"> ינואר</a>
-                    <div class="dropdown-content">
-                        <!--days--><table>
-                        {% for i in range(31) %}
-                            <td><a href="#{{i}}">{{i}}</a></td>
-                        {% endfor %}
-                        </table>
-                    </div>
-                </li>
-                <li><a href="#">פברואר </a></li>
-                <li><a href="#">מרץ </a></li>
-                <li><a href="#">אפריל </a></li>
-                <li><a href="#">מאי </a></li>
-                <li><a href="#">יוני </a></li>
-                <li><a href="#">יולי </a></li>
-                <li><a href="#">אוגוסט </a></li>
-                <li><a href="#">ספטמבר </a></li>
-                <li><a href="#">אוקטובר </a></li>
-                <li><a href="#"> נובמבר </a></li>
-                <li><a href="#">דצמבר </a></li>
-            </ul>
-        </div>
-        <br>
-        <!--Shift M/N--><div>
-            <form>
-            <h3>Select Shift:  <select class="button" name="shift">
-                <option value="morring"> משמרת בוקר </option>
-                <option value="evening">  משמרת ערב </option>
-            </select></h3>
-            </form>
-        </div>
-        <!--Date,manger--><h3>Date:<input type="date" id="date"><br></br>
-            אחמ"ש:<input type="text" id="manger"> </h3>
-
+        <!--Bar--><div class="bar_header">
+                <ul>
+                    <li><a href="#">Date: <input type="date"></a></li>
+                    <li><a href="#">Manger: <input type="text" id="manger"> </a></li>
+                    <li><a href="#">Select Shift:  <select class="button" name="shift">
+                        <option value="morring"> משמרת בוקר </option>
+                        <option value="evening">  משמרת ערב </option>
+                    </select></a></li>
+                </ul>
+            </div>
         <br>
         <form method="POST">
         <!--total-Table--><div class="table">
@@ -112,6 +78,7 @@
                 {% endfor %}
             </table>
         </div>
+            <br>
             <h3><input type="submit" name="Submit" value="Submit" style="height:40px;width:150px"></h3>
         </form>
         </div>

@@ -59,7 +59,7 @@ def jems_beer():
 @app.route('/', methods=['POST', 'GET'])
 def jems_beer_update():
     waiter = Models.WaitersTable
-    money = Models.Money
+    shift = Models.Money
     if request.method == 'POST':
         total_cash = request.form.get('total_cash')
         total_credit = request.form.get('total_credit')
@@ -75,40 +75,41 @@ def jems_beer_update():
         credit_per_hour = 0
         total_tip = 0
 
-        money = Models.Money(total_hours, total_cash, total_credit, cash_per_hour, credit_per_hour, total_tip)
-        money.init_money()
+        shift = Models.Money(total_hours, total_cash, total_credit, cash_per_hour, credit_per_hour, total_tip)
+        shift.init_money()
         for i in range(len(names)):
             waiter = Models.WaitersTable(i+1, names[i], start_time_waiter[i], finish_time_waiter[i],
                                          total_waiter_time[i], total_cash_waiter, total_credit_waiter, total_tip_waiter)
-            waiter.init_waiter(waiter, money)
+            waiter.init_waiter(waiter, shift)
 
         # Calculate the cash per hour, credit per hour, total tip:
-        if money.total_hours > 0:
-            money.calculate_money()
-        money.total_tip = money.cash_per_hour + money.credit_per_hour
+        if shift.total_hours > 0:
+            shift.calculate_money()
+        shift.total_tip = shift.cash_per_hour + shift.credit_per_hour
         # Calculate the cash and credit for each waiter:
         for i in range(len(names)):
-            waiter.waiters[i].calculate_tip_each_waiter(money)
+            waiter.waiters[i].calculate_tip_each_waiter(shift)
         # send to db (database,"DB Browser (SQLite)"):
-        day_tip = [Models.Money(total_hours=money.total_hours, total_cash=money.total_cash,
-                                total_credit=money.total_credit, cash_per_hour=money.cash_per_hour,
-                                credit_per_hour=money.credit_per_hour, total_tip=money.total_tip)]
+        day_tip = [Models.Money(total_hours=shift.total_hours, total_cash=shift.total_cash,
+                                total_credit=shift.total_credit, cash_per_hour=shift.cash_per_hour,
+                                credit_per_hour=shift.credit_per_hour, total_tip=shift.total_tip)]
         for y in day_tip:
             db.session.add(y)
         db.session.commit()
         # print(waiters)
         for waiter in waiter.waiters:
+            print(waiter)
             if waiter.name != '':
                 db.session.add(waiter)
             db.session.commit()
     # send to html:
     return render_template('Jems-tips1.html',
-                           total_hours=money.total_hours,
-                           total_cash=money.total_cash,
-                           total_credit=money.total_credit,
-                           cash_per_hour=money.cash_per_hour,
-                           credit_per_hour=money.credit_per_hour,
-                           total_tip=money.total_tip,
+                           total_hours=shift.total_hours,
+                           total_cash=shift.total_cash,
+                           total_credit=shift.total_credit,
+                           cash_per_hour=shift.cash_per_hour,
+                           credit_per_hour=shift.credit_per_hour,
+                           total_tip=shift.total_tip,
                            name=waiter.waiters_name,
                            start_time=waiter.start_time_waiter_list,
                            finish_time=waiter.finish_time_waiter_list,
