@@ -10,18 +10,18 @@
     {% extends "base.html" %}
     {% block content %}
         <div class="home">
+            <form method="POST">
         <!--Bar--><div class="bar_header">
                 <ul>
-                    <li><a href="#">Date: <input type="date"></a></li>
-                    <li><a href="#">Manger: <input type="text" id="manger"> </a></li>
-                    <li><a href="#">Select Shift:  <select class="button" name="shift">
+                    <li><a href="#">Date: <input name="date" type="date" value="{{date}}"></a></li>
+                    <li><a href="#">Manager: <input name="manager" type="text" id="manager" value="{{manager}}"></a></li>
+                    <li><a href="#">Select Shift:  <select class="button" name="shift" >
                         <option value="morring"> משמרת בוקר </option>
                         <option value="evening">  משמרת ערב </option>
                     </select></a></li>
                 </ul>
             </div>
         <br>
-        <form method="POST">
         <!--total-Table--><div class="table">
             <table>
                 <tr>
@@ -72,16 +72,17 @@
                     <td> <input type="float" id="total_time{{i+1}}" name="total_time" placeholder="Time" value="{{total_waiter_time[loop.index0]}}"> </td>
                     <td> {{total_cash_waiter[loop.index0]}} </td>
                     <td> {{total_credit_waiter[loop.index0]}} </td>
-                        <td> {{total_tips[loop.index0]}} </td>>
+                    <td> {{total_tips[loop.index0]}} </td>
 
                 </tr>
                 {% endfor %}
             </table>
         </div>
             <br>
-            <h3><input type="submit" name="Submit" value="Submit" style="height:40px;width:150px"></h3>
-        </form>
+            <h3><input class="submit" type="submit" name="Submit" value="Submit" ></h3>
+            </form>
         </div>
+
     {% endblock %}
     </body>
 </html>

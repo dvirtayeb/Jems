@@ -5,6 +5,7 @@ import os
 from Forms import WaiterForm
 from flask_migrate import Migrate
 import Models
+
 app = Flask(__name__)
 SECRET_KEY = os.environ.get('SECRET_KEY') or '076f2ce915e884096c9ae907479b316e'
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -13,14 +14,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}\\dataBase\\jems_db.db'.for
 db = SQLAlchemy(app)  # Database
 migrate = Migrate(app, db)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+counter = 1
 
 
 @app.route('/form_waiter1/', methods=['GET', 'POST'])
 def form_new_waiter():
+    global counter
     waiter_form = WaiterForm()
+    new_waiter = [Models.Waiters(waiter_name=waiter_form.waiter_name.data, job_name=waiter_form.job_name.data,
+                                 age=waiter_form.age.data, location=waiter_form.location.data,
+                                 phone=waiter_form.phone.data)]
     if waiter_form.validate_on_submit():
         flash('The waiter has registered successfully')
+        counter = counter + 1
+        # add to db:
+        for w in new_waiter:
+            db.session.add(w)
+        db.session.commit()
         return redirect(url_for('form_new_waiter'))
+    if waiter_form.waiter_name.data == "":
+        flash("You didn't insert a name!")
+    if waiter_form.job_name.data == "":
+        flash("You didn't insert a job name!")
     return render_template('form_waiter1.html', form=waiter_form)
 
 
@@ -31,6 +46,7 @@ def about():
 
 @app.route('/')
 def jems_beer():
+    # reset_waiter = ResetWaiter()
     waiter = Models.WaitersTable
     money = Models.Money
     time_zero = datetime(1, 1, 1).time()
@@ -46,13 +62,8 @@ def jems_beer():
     waiter.cash_waiter_list = []
     waiter.credit_waiter_list = []
     waiter.all_tips_waiters_list = []
-    return render_template("jems-tips1.html", waiters=[],
-                           name='',
-                           start_time='',
-                           finish_time='',
-                           total_waiter_time='',
-                           total_cash_waiter='',
-                           total_credit_waiter='',
+    return render_template("jems-tips1.html", waiters=[], name='', start_time='', finish_time='',
+                           total_waiter_time='', total_cash_waiter='', total_credit_waiter='',
                            total_tips='')
 
 
@@ -61,6 +72,9 @@ def jems_beer_update():
     waiter = Models.WaitersTable
     shift = Models.Money
     if request.method == 'POST':
+        date = request.form.get('date')
+        manager = request.form.get('manager')
+        selected_shift = request.form.get('shift')
         total_cash = request.form.get('total_cash')
         total_credit = request.form.get('total_credit')
         names = request.form.getlist('name')
@@ -75,10 +89,16 @@ def jems_beer_update():
         credit_per_hour = 0
         total_tip = 0
 
-        shift = Models.Money(total_hours, total_cash, total_credit, cash_per_hour, credit_per_hour, total_tip)
-        shift.init_money()
+        shift = Models.Money(date, manager, selected_shift, total_hours, total_cash, total_credit, cash_per_hour, credit_per_hour, total_tip)
+        shift.init_cash_credit_money()
+        if shift.date != "":
+            shift.date = datetime.fromisoformat(shift.date)
+        else:
+            flash("there is no date!")
+            shift.date = None
+
         for i in range(len(names)):
-            waiter = Models.WaitersTable(i+1, names[i], start_time_waiter[i], finish_time_waiter[i],
+            waiter = Models.WaitersTable(i + 1, names[i], start_time_waiter[i], finish_time_waiter[i],
                                          total_waiter_time[i], total_cash_waiter, total_credit_waiter, total_tip_waiter)
             waiter.init_waiter(waiter, shift)
 
@@ -90,32 +110,26 @@ def jems_beer_update():
         for i in range(len(names)):
             waiter.waiters[i].calculate_tip_each_waiter(shift)
         # send to db (database,"DB Browser (SQLite)"):
-        day_tip = [Models.Money(total_hours=shift.total_hours, total_cash=shift.total_cash,
+        day_tip = [Models.Money(date=shift.date, manager=shift.manager, selected_shift=shift.selected_shift,
+                                total_hours=shift.total_hours, total_cash=shift.total_cash,
                                 total_credit=shift.total_credit, cash_per_hour=shift.cash_per_hour,
                                 credit_per_hour=shift.credit_per_hour, total_tip=shift.total_tip)]
         for y in day_tip:
             db.session.add(y)
         db.session.commit()
         # print(waiters)
-        for waiter in waiter.waiters:
-            print(waiter)
+        for w in waiter.waiters:
+            print(w)
             if waiter.name != '':
-                db.session.add(waiter)
+                db.session.add(w)
             db.session.commit()
     # send to html:
-    return render_template('Jems-tips1.html',
-                           total_hours=shift.total_hours,
-                           total_cash=shift.total_cash,
-                           total_credit=shift.total_credit,
-                           cash_per_hour=shift.cash_per_hour,
-                           credit_per_hour=shift.credit_per_hour,
-                           total_tip=shift.total_tip,
-                           name=waiter.waiters_name,
-                           start_time=waiter.start_time_waiter_list,
-                           finish_time=waiter.finish_time_waiter_list,
-                           total_waiter_time=waiter.total_waiter_time_list,
-                           total_cash_waiter=waiter.cash_waiter_list,
-                           total_credit_waiter=waiter.credit_waiter_list,
+    return render_template('Jems-tips1.html', total_hours=shift.total_hours, total_cash=shift.total_cash,
+                           total_credit=shift.total_credit, cash_per_hour=shift.cash_per_hour,
+                           credit_per_hour=shift.credit_per_hour, total_tip=shift.total_tip,
+                           name=waiter.waiters_name, start_time=waiter.start_time_waiter_list,
+                           finish_time=waiter.finish_time_waiter_list, total_waiter_time=waiter.total_waiter_time_list,
+                           total_cash_waiter=waiter.cash_waiter_list, total_credit_waiter=waiter.credit_waiter_list,
                            total_tips=waiter.all_tips_waiters_list
                            )
 

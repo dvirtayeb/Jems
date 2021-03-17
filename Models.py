@@ -27,7 +27,8 @@ class BaseModel(Program.db.Model):
 
 class Waiters(Program.db.Model):
     __table_name__ = 'waiters'
-    waiter_name = Column('Name', String(20), nullable=True, primary_key=True)
+    id = Column('ID', Integer, primary_key=True)
+    waiter_name = Column('Name', String(20), nullable=True)
     job_name = Column('Job_Name', String(20), nullable=True)
     age = Column('Age', Integer, nullable=True)
     location = Column('Location', String(20), nullable=True)
@@ -44,6 +45,9 @@ class Waiters(Program.db.Model):
 class Money(Program.db.Model):
     __table_name__ = 'money'
     id = Column('id_money', Integer, primary_key=True)
+    date = Column('date', Date, nullable=False)
+    manager = Column('manager', String(20), nullable=True)
+    selected_shift = Column('selected - shift', String(20))
     total_hours = Column('Total - Hours', Float, nullable=True)
     total_cash = Column('Total - Cash', Float, nullable=True)
     total_credit = Column('Total - Credit', Float, nullable=True)
@@ -51,7 +55,11 @@ class Money(Program.db.Model):
     credit_per_hour = Column('Credit per hour', Float, nullable=True)
     total_tip = Column('total tip', Float, nullable=True)
 
-    def __init__(self, total_hours, total_cash, total_credit, cash_per_hour, credit_per_hour, total_tip):
+    def __init__(self, date, manager, selected_shift, total_hours, total_cash, total_credit, cash_per_hour,
+                 credit_per_hour, total_tip):
+        self.date = date
+        self.manager = manager
+        self.selected_shift = selected_shift
         self.total_hours = total_hours
         self.total_cash = total_cash
         self.total_credit = total_credit
@@ -89,7 +97,7 @@ class Money(Program.db.Model):
     def calculate_credit_per_hour(self):
         self.credit_per_hour = round(float(self.total_credit) / self.total_hours, 2)
 
-    def init_money(self):
+    def init_cash_credit_money(self):
         self.set_total_cash_shift()
         self.set_total_credit_shift()
 
@@ -98,14 +106,11 @@ class Money(Program.db.Model):
         self.calculate_credit_per_hour()
 
     def __repr__(self):
-        return 'total hours: {}, total cash: {}, total_credit: {}, cash_per_hour: {}, credit_per_hour: {},' \
+        return 'date: {}, manager: {}, selected shift: {}, total hours: {},' \
+               ' total cash: {}, total_credit: {}, cash_per_hour: {}, credit_per_hour: {},' \
                ' total_tip: {} '\
-            .format(self.total_hours, self.total_cash, self.total_credit, self.cash_per_hour, self.credit_per_hour,
-                    self.total_tip)
-
-
-    def __repr__(self):
-        pass
+            .format(self.date,  self.manager, self.selected_shift, self.total_hours, self.total_cash, self.total_credit,
+                    self.cash_per_hour, self.credit_per_hour, self.total_tip)
 
 
 class WaitersTable(Program.db.Model):

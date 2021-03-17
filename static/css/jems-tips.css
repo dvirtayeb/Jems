@@ -1,8 +1,18 @@
 /*its work*/
 * {
     box-sizing: border-box;
+    margin: 0 auto;
+
   }
 
+  .menu {
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    padding: 5px;
+    width: 300px;
+
+  }
 .header {
     background: url(logo_home.png) center ;
     background-size: contain;
@@ -21,9 +31,9 @@
     padding: 10px 15px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+    /* display: inline-block; */
     font-size: 16px;
-    margin: 4px 2px;
+    margin: 0 auto;
     cursor: pointer;
 }
 
@@ -42,23 +52,27 @@ table, td, th {
     padding: 20px; 
     width: 800px;
     height: 200px;
-    text-align: center
+    text-align: center;
+    margin: 0 auto;
+
   }
   body{
       background-color: white;
+      margin: 0 auto;
   }
   ul {
-    margin: 0;
     padding: 100;
     background-color: #ffffff;
     width: 40%;
     border-style: solid;
     border-width: 1px;
+    margin: 0 auto;
   }
   
   li {
     float: center;
     border-left: 7px solid rgb(74, 168, 137);
+    margin: 0 auto;
   }
   
   li a {
@@ -78,9 +92,44 @@ table, td, th {
     color: rgb(255, 254, 223);
     padding: 15px;
     text-align: center;
+    margin: 0 auto;
   }
 
 .disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.submit {
+    margin: 0 auto;
+    height: 40px;
+    width: 150px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Form page: */
+
+.form {
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+}
+
+.form p {
+  padding: 10px;
+  display: block;
+}
+
+.form textfield {
+  padding: 15px;
+  margin-right: 10px;
+  display: inline-table;
+}
+
+/* About page: */
+
+.about {
+    margin: 0 auto;
+    text-align: center;
 }
