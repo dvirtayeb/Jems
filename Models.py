@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db.models.expressions import Col
 
 import Program
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time, Float, Date
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time, Float, Date, select
 
 
 # model for db:
@@ -123,6 +123,7 @@ class WaitersTable(Program.db.Model):
     total_cash_waiter = Column('T-Cash-waiter', Float, nullable=True)
     total_credit_waiter = Column('T-Credit-waiter', Float, nullable=True)
     total_tip_waiter = Column('Total-money', Float, nullable=True)
+    shift_id = Column('shift_id', Integer)
     time_zero = datetime(1, 1, 1).time()
     waiters = []
     waiters_name = []
@@ -134,7 +135,7 @@ class WaitersTable(Program.db.Model):
     all_tips_waiters_list = []
 
     def __init__(self, id_waiter, name, start_time_waiter, finish_time_waiter, total_waiter_time, total_cash_waiter,
-                 total_credit_waiter, total_tip_waiter):
+                 total_credit_waiter, total_tip_waiter, shift_id):
         self.id_waiter = id_waiter
         self.name = name
         self.start_time_waiter = start_time_waiter
@@ -143,6 +144,7 @@ class WaitersTable(Program.db.Model):
         self.total_cash_waiter = total_cash_waiter
         self.total_credit_waiter = total_credit_waiter
         self.total_tip_waiter = total_tip_waiter
+        self.shift_id = shift_id
 
     def get_name(self):
         return self.name
@@ -167,8 +169,7 @@ class WaitersTable(Program.db.Model):
 
     def set_start_time_zero(self):
         if self.start_time_waiter == '':
-            pass
-        self.start_time_waiter = self.time_zero
+            self.start_time_waiter = self.time_zero
 
     def set_finish_time_zero(self):
         if self.finish_time_waiter == '':
@@ -221,6 +222,7 @@ class WaitersTable(Program.db.Model):
     # "to String":
     def __repr__(self):
         return '<waiters:id:{}, name: {}, start time: {}, end time: {}, total time: {},' \
-               ' total cash waiter: {}, total credit waiter:{}, total tip:{}\n'\
+               ' total cash waiter: {}, total credit waiter:{}, total tip:{}, shift ID: {}\n'\
             .format(self.id_waiter, self.name, self.start_time_waiter, self.finish_time_waiter,
-                    self.total_waiter_time, self.total_cash_waiter, self.total_credit_waiter, self.total_tip_waiter)
+                    self.total_waiter_time, self.total_cash_waiter, self.total_credit_waiter, self.total_tip_waiter,
+                    self.shift_id)

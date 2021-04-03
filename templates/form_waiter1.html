@@ -13,37 +13,47 @@
         <h1>Form - New Waiter</h1>
         {{ form.hidden_tag() }}
         <p>
+        <ul>
+            <li>
             {{ form.waiter_name.label }} (*)
             <textfield>
                 {{ form.waiter_name(size=22) }}
             </textfield>
+            </li>
         </p>
         <p>
+            <li>
             {{ form.job_name.label }} (*)
             <textfield>
                 {{ form.job_name(size=22) }}
             </textfield>
-
+            </li>
          <p>
+            <li>
             {{ form.age.label }}
             <textfield>
                 {{ form.age(size=22) }}
             </textfield>
+            </li>
         </p>
         <p>
+            <li>
             {{ form.phone.label }}
             <textfield>
             {{ form.phone(size=22) }}
             </textfield>
+            </li>
         </p>
         <p>
+            <li>
             {{ form.location.label }}
             <textfield>
              {{ form.location(size=22) }}
             </textfield>
+            </li>
         </p>
-
-        <p><span style="height:40px;width:150px">{{ form.submit() }}</span> </p>
+        <p class="show_submit"><span style="height:40px;width:150px">{{ form.submit() }}</span> </p>
+        </ul>
     </form>
 {% endblock %}
 </body>

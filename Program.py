@@ -15,6 +15,8 @@ db = SQLAlchemy(app)  # Database
 migrate = Migrate(app, db)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 counter = 1
+counter_waiter = 1
+counter_shift = 1
 
 
 @app.route('/form_waiter1/', methods=['GET', 'POST'])
@@ -71,8 +73,11 @@ def jems_beer():
 def jems_beer_update():
     waiter = Models.WaitersTable
     shift = Models.Money
+    date = None
+    global counter_waiter
+    global counter_shift
     if request.method == 'POST':
-        date = request.form.get('date')
+        date = request.form.get('date_shift')
         manager = request.form.get('manager')
         selected_shift = request.form.get('shift')
         total_cash = request.form.get('total_cash')
@@ -88,19 +93,30 @@ def jems_beer_update():
         cash_per_hour = 0
         credit_per_hour = 0
         total_tip = 0
+        use_shift_id = 1
+        use_waiter_id = 1
 
-        shift = Models.Money(date, manager, selected_shift, total_hours, total_cash, total_credit, cash_per_hour, credit_per_hour, total_tip)
+        shift = Models.Money(date, manager, selected_shift, total_hours, total_cash, total_credit, cash_per_hour,
+                             credit_per_hour, total_tip)
         shift.init_cash_credit_money()
         if shift.date != "":
             shift.date = datetime.fromisoformat(shift.date)
         else:
-            flash("there is no date!")
+            flash("There is no date!")
             shift.date = None
-
+        shift_id = Models.Money.query.all()
+        for id in shift_id:
+            use_shift_id = id.id
+        waiter_id_db = Models.WaitersTable.query.all()
+        for waiter_id in waiter_id_db:
+            use_waiter_id = waiter_id.id_waiter
         for i in range(len(names)):
-            waiter = Models.WaitersTable(i + 1, names[i], start_time_waiter[i], finish_time_waiter[i],
-                                         total_waiter_time[i], total_cash_waiter, total_credit_waiter, total_tip_waiter)
+            waiter = Models.WaitersTable(use_waiter_id, names[i], start_time_waiter[i], finish_time_waiter[i],
+                                         total_waiter_time[i], total_cash_waiter, total_credit_waiter, total_tip_waiter,
+                                         use_shift_id+1)
             waiter.init_waiter(waiter, shift)
+            use_waiter_id = use_waiter_id + 1
+            counter_waiter = counter_waiter + 1
 
         # Calculate the cash per hour, credit per hour, total tip:
         if shift.total_hours > 0:
@@ -113,25 +129,70 @@ def jems_beer_update():
         day_tip = [Models.Money(date=shift.date, manager=shift.manager, selected_shift=shift.selected_shift,
                                 total_hours=shift.total_hours, total_cash=shift.total_cash,
                                 total_credit=shift.total_credit, cash_per_hour=shift.cash_per_hour,
-                                credit_per_hour=shift.credit_per_hour, total_tip=shift.total_tip)]
+                                credit_per_hour=shift.credit_per_hour, total_tip=round(shift.total_tip, 3))]
         for y in day_tip:
             db.session.add(y)
         db.session.commit()
         # print(waiters)
         for w in waiter.waiters:
             print(w)
-            if waiter.name != '':
+            if w.name != '':
                 db.session.add(w)
-            db.session.commit()
+        db.session.commit()
+        counter_shift = counter_shift + 1
     # send to html:
-    return render_template('Jems-tips1.html', total_hours=shift.total_hours, total_cash=shift.total_cash,
-                           total_credit=shift.total_credit, cash_per_hour=shift.cash_per_hour,
-                           credit_per_hour=shift.credit_per_hour, total_tip=shift.total_tip,
+    return render_template('Jems-tips1.html', date_shift=date, manager=shift.manager,
+                           selected_shift=shift.selected_shift, total_hours=shift.total_hours,
+                           total_cash=shift.total_cash, total_credit=shift.total_credit,
+                           cash_per_hour=shift.cash_per_hour,
+                           credit_per_hour=shift.credit_per_hour, total_tip=round(shift.total_tip, 3),
                            name=waiter.waiters_name, start_time=waiter.start_time_waiter_list,
                            finish_time=waiter.finish_time_waiter_list, total_waiter_time=waiter.total_waiter_time_list,
                            total_cash_waiter=waiter.cash_waiter_list, total_credit_waiter=waiter.credit_waiter_list,
                            total_tips=waiter.all_tips_waiters_list
                            )
+
+
+@app.route('/Date_Page', methods=['GET', 'POST'])
+def show_date_tips_page():
+    show_date = None
+    money_shift = None
+    waiter_shift = None
+    waiter = None
+    counter_w = 0
+    global counter_shift
+    report = "detail-not exist"
+    waiter_names = []
+    show_date = request.form.get('show_date')
+    if request.method == 'POST':
+        money_shift = Models.Money.query.all()
+        waiter_shift = Models.WaitersTable.query.all()
+        for v_shift in money_shift:
+            if v_shift.date == datetime.fromisoformat(show_date).date():
+                counter_w = counter_w+1
+                for w_shift in waiter_shift:
+                    if w_shift.shift_id == v_shift.id:
+                        waiter_names.append(w_shift.name)
+                        print(waiter_names)
+                        waiter = [Models.WaitersTable(w_shift.id_waiter, w_shift.name, w_shift.start_time_waiter,
+                                                      w_shift.finish_time_waiter,
+                                                      w_shift.total_waiter_time, w_shift.total_cash_waiter,
+                                                      w_shift.total_credit_waiter, w_shift.total_tip_waiter,
+                                                      counter_shift)]
+                # print(waiter)
+                report = "detail-exist"
+                return render_template('Date_Page.html', show_date=show_date, report=report,
+                                       show_manager=v_shift.manager,
+                                       show_selected_shift=v_shift.selected_shift, total_hours=v_shift.total_hours,
+                                       total_cash=v_shift.total_cash, total_credit=v_shift.total_credit,
+                                       cash_per_hour=v_shift.cash_per_hour, credit_per_hour=v_shift.credit_per_hour,
+                                       total_tip=v_shift.total_tip, id=counter_w, name=waiter_names)
+                                       # start_time=waiter[counter_w].start_time,
+                                       # finish_time=waiter[counter_w].finish_time)
+
+
+        # print(money_shift)
+    return render_template('Date_Page.html', show_date=show_date, report=report)
 
 
 # reset the app:
