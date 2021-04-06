@@ -161,28 +161,38 @@ def show_date_tips_page():
     waiter = None
     counter_w = 0
     global counter_shift
-    report = "detail-not exist"
+    report = "empty"
     waiter_names = []
     show_date = request.form.get('show_date')
+    shift = request.form.get('shift')
+    if shift is None or shift == '':
+        shift = "morning"
     if request.method == 'POST':
+        report = "detail-not exist"
+        if show_date == '':
+            flash("You didn't insert a Date")
+            return render_template('Date_Page.html', show_date=show_date, report=report)
         money_shift = Models.Money.query.all()
         waiter_shift = Models.WaitersTable.query.all()
         for v_shift in money_shift:
             if v_shift.date == datetime.fromisoformat(show_date).date():
-                counter_w = counter_w+1
-                for w_shift in waiter_shift:
-                    if w_shift.shift_id == v_shift.id:
-                        waiter_names.append(w_shift.name)
-                        print(waiter_names)
-                        waiter = [Models.WaitersTable(w_shift.id_waiter, w_shift.name, w_shift.start_time_waiter,
-                                                      w_shift.finish_time_waiter,
-                                                      w_shift.total_waiter_time, w_shift.total_cash_waiter,
-                                                      w_shift.total_credit_waiter, w_shift.total_tip_waiter,
-                                                      counter_shift)]
+                if v_shift.selected_shift == shift:
+                    counter_w = counter_w+1
+                    for w_shift in waiter_shift:
+                        if w_shift.shift_id == v_shift.id:
+                            waiter_names.append(w_shift.name)
+                            print(waiter_names)
+                            waiter = [Models.WaitersTable(w_shift.id_waiter, w_shift.name, w_shift.start_time_waiter,
+                                                          w_shift.finish_time_waiter,
+                                                          w_shift.total_waiter_time, w_shift.total_cash_waiter,
+                                                          w_shift.total_credit_waiter, w_shift.total_tip_waiter,
+                                                          counter_shift)]
                 # print(waiter)
-                report = "detail-exist"
-                return render_template('Date_Page.html', show_date=show_date, report=report,
-                                       show_manager=v_shift.manager,
+                    report = "detail-exist"
+                if report == "detail-not exist":
+                    flash(" Didn't found a shift")
+                return render_template('Date_Page.html', show_date=show_date, shift=shift,
+                                       report=report, show_manager=v_shift.manager,
                                        show_selected_shift=v_shift.selected_shift, total_hours=v_shift.total_hours,
                                        total_cash=v_shift.total_cash, total_credit=v_shift.total_credit,
                                        cash_per_hour=v_shift.cash_per_hour, credit_per_hour=v_shift.credit_per_hour,
@@ -190,7 +200,8 @@ def show_date_tips_page():
                                        # start_time=waiter[counter_w].start_time,
                                        # finish_time=waiter[counter_w].finish_time)
 
-
+    if report == "detail-not exist":
+        flash(" Didn't found a shift")
         # print(money_shift)
     return render_template('Date_Page.html', show_date=show_date, report=report)
 

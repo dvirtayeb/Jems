@@ -10,15 +10,24 @@
 {% block content %}
     <div class="dates">
         <form method="POST">
-            <h1>Shift Search</h1>
-            <h4>Pick a Date:</h4>
-            <a href="#"><input name="show_date" type="date" value="{{show_date}}"></a>
+            <h1>Search Shift</h1>
+            <ul class="vars_input">
+            <li><a href="#"><h4>Pick a Date:</h4><input name="show_date" type="date" value="{{show_date}}"></a></li>
+            <li><a href="#"><label for="shift">Select Shift:  <select class="button" name="shift" id="shift">
+                        <option value="morning" id="morning"> משמרת בוקר </option>
+                        <option value="evening" id="evening">  משמרת ערב </option>
+            </select></label></a></li>
+            </ul>
+            <br>
             <h3><input class="show_submit" type="submit" name="Show_Submit" value="Search"></h3>
             {% if report == "detail-not exist" %}
             <div style="display: none;">
-            {% else %}
+            {% elif report == "detail-exist" %}
             <div style="display: block;">
+                <br></br>
+                <h1> -------------------- Shift -------------------- </h1>
                 <ul>
+                    <li><a href="#">Date:   <input name="show_date" type="date" value="{{show_date}}" disabled></a></li>
                 <li><a>Manager:   {{show_manager}} </a> </li>
                 <li><a>Shift:   {{show_selected_shift}} </a></li>
                 </ul>
@@ -63,7 +72,8 @@
                     <td>  </td>
                     <td>  </td>
                 </tr>
-                {% endfor %}
+                {% endfor %} {% else %}
+                    <br>
             {% endif %}
                 </table>
             </div>
