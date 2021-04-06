@@ -65,12 +65,12 @@
                 <tr>
                     <td>{{i+1}}</td>
                     <td> {{ name[loop.index0] }} </td>
-                    <td>  </td>
-                    <td>  </td>
-                    <td>  </td>
-                    <td>  </td>
-                    <td>  </td>
-                    <td>  </td>
+                    <td> {{ start_time[loop.index0] }}</td>
+                    <td> {{ finish_time[loop.index0] }} </td>
+                    <td> {{total_waiter_time[loop.index0]}} </td>
+                    <td> {{total_cash_waiter[loop.index0]}} </td>
+                    <td> {{total_credit_waiter[loop.index0]}} </td>
+                    <td> {{total_tips[loop.index0]}} </td>
                 </tr>
                 {% endfor %} {% else %}
                     <br>

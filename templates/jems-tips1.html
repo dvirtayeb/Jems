@@ -66,10 +66,18 @@
                 {% for i in range(12) %}
                 <tr>
                     <td>{{i+1}}</td>
-                    <td> <input type="text" id="name{{i+1}}" name="name" placeholder="Name" value="{{ name[loop.index0] }}"> </td>
-                    <td> <input type="time" id="start_time{{i+1}}" name="start_time" placeholder="Start" value="{{start_time[loop.index0]}}"> </td>
-                    <td> <input type="time" id="finish_time{{i+1}}" name="finish_time" placeholder="Finish" value="{{finish_time[loop.index0]}}"> </td>
-                    <td> <input type="float" id="total_time{{i+1}}" name="total_time" placeholder="Time" value="{{total_waiter_time[loop.index0]}}"> </td>
+                    <td>
+                        <input type="text" id="name{{i+1}}" name="name" placeholder="Name"
+                               value="{{ name[loop.index0] }}"> </td>
+                    <td>
+                        <input type="time" id="start_time{{i+1}}" name="start_time" placeholder="Start"
+                               value="{{start_time[loop.index0]}}"> </td>
+                    <td>
+                        <input type="time" id="finish_time{{i+1}}" name="finish_time" placeholder="Finish"
+                               value="{{finish_time[loop.index0]}}"> </td>
+                    <td>
+                        <input type="float" id="total_time{{i+1}}" name="total_time" placeholder="Time"
+                               value="{{total_waiter_time[loop.index0]}}"> </td>
                     <td> {{total_cash_waiter[loop.index0]}} </td>
                     <td> {{total_credit_waiter[loop.index0]}} </td>
                     <td> {{total_tips[loop.index0]}} </td>

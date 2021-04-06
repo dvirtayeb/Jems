@@ -145,6 +145,7 @@ class WaitersTable(Program.db.Model):
         self.total_credit_waiter = total_credit_waiter
         self.total_tip_waiter = total_tip_waiter
         self.shift_id = shift_id
+        self.waiters_name = []
 
     def get_name(self):
         return self.name
@@ -207,6 +208,15 @@ class WaitersTable(Program.db.Model):
             self.cash_waiter_list.append('')
             self.credit_waiter_list.append('')
             self.all_tips_waiters_list.append('')
+
+    def clear_all_lists(self):
+        self.waiters_name = []
+        self.start_time_waiter_list = []
+        self.finish_time_waiter_list = []
+        self.total_waiter_time_list = []
+        self.cash_waiter_list = []
+        self.credit_waiter_list = []
+        self.all_tips_waiters_list = []
 
     def init_waiter(self, waiter, money):
         self.set_start_time_zero()

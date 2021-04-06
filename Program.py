@@ -113,7 +113,7 @@ def jems_beer_update():
         for i in range(len(names)):
             waiter = Models.WaitersTable(use_waiter_id, names[i], start_time_waiter[i], finish_time_waiter[i],
                                          total_waiter_time[i], total_cash_waiter, total_credit_waiter, total_tip_waiter,
-                                         use_shift_id+1)
+                                         use_shift_id + 1)
             waiter.init_waiter(waiter, shift)
             use_waiter_id = use_waiter_id + 1
             counter_waiter = counter_waiter + 1
@@ -157,12 +157,19 @@ def jems_beer_update():
 def show_date_tips_page():
     show_date = None
     money_shift = None
-    waiter_shift = None
     waiter = None
+    flag = True
     counter_w = 0
     global counter_shift
     report = "empty"
-    waiter_names = []
+    waiter_model = Models.WaitersTable
+    waiter_model.waiters_name = []
+    waiter_model.start_time_waiter_list = []
+    waiter_model.finish_time_waiter_list = []
+    waiter_model.total_waiter_time_list = []
+    waiter_model.cash_waiter_list = []
+    waiter_model.credit_waiter_list = []
+    waiter_model.all_tips_waiters_list = []
     show_date = request.form.get('show_date')
     shift = request.form.get('shift')
     if shift is None or shift == '':
@@ -172,33 +179,38 @@ def show_date_tips_page():
         if show_date == '':
             flash("You didn't insert a Date")
             return render_template('Date_Page.html', show_date=show_date, report=report)
-        money_shift = Models.Money.query.all()
-        waiter_shift = Models.WaitersTable.query.all()
-        for v_shift in money_shift:
-            if v_shift.date == datetime.fromisoformat(show_date).date():
-                if v_shift.selected_shift == shift:
-                    counter_w = counter_w+1
-                    for w_shift in waiter_shift:
-                        if w_shift.shift_id == v_shift.id:
-                            waiter_names.append(w_shift.name)
-                            print(waiter_names)
-                            waiter = [Models.WaitersTable(w_shift.id_waiter, w_shift.name, w_shift.start_time_waiter,
-                                                          w_shift.finish_time_waiter,
-                                                          w_shift.total_waiter_time, w_shift.total_cash_waiter,
-                                                          w_shift.total_credit_waiter, w_shift.total_tip_waiter,
-                                                          counter_shift)]
-                # print(waiter)
-                    report = "detail-exist"
-                if report == "detail-not exist":
-                    flash(" Didn't found a shift")
-                return render_template('Date_Page.html', show_date=show_date, shift=shift,
-                                       report=report, show_manager=v_shift.manager,
-                                       show_selected_shift=v_shift.selected_shift, total_hours=v_shift.total_hours,
-                                       total_cash=v_shift.total_cash, total_credit=v_shift.total_credit,
-                                       cash_per_hour=v_shift.cash_per_hour, credit_per_hour=v_shift.credit_per_hour,
-                                       total_tip=v_shift.total_tip, id=counter_w, name=waiter_names)
-                                       # start_time=waiter[counter_w].start_time,
-                                       # finish_time=waiter[counter_w].finish_time)
+        money_shift = Models.Money.query.filter_by(date=datetime.fromisoformat(show_date).date()).first()
+        if money_shift is None:
+            flash("Didn't found a Date")
+            return render_template('Date_Page.html', show_date=show_date, report=report)
+        if money_shift.date == datetime.fromisoformat(show_date).date():
+            if money_shift.selected_shift == shift:
+                while flag is True:
+                    counter_w = counter_w + 1
+                    waiter = Models.WaitersTable.query.filter_by(shift_id=money_shift.id, id_waiter=counter_w).first()
+                    if waiter is not None:
+                        waiter_model.waiters_name.append(waiter.name)
+                        waiter_model.start_time_waiter_list.append(waiter.start_time_waiter.strftime("%H:%M"))
+                        waiter_model.finish_time_waiter_list.append(waiter.finish_time_waiter.strftime("%H:%M"))
+                        waiter_model.total_waiter_time_list.append(waiter.total_waiter_time)
+                        waiter_model.cash_waiter_list.append(waiter.total_cash_waiter)
+                        waiter_model.credit_waiter_list.append(waiter.total_credit_waiter)
+                        waiter_model.all_tips_waiters_list.append(waiter.total_tip_waiter)
+                    if waiter is None:
+                        flag = False
+                report = "detail-exist"
+                return render_template('Date_Page.html', show_date=show_date, shift=shift, report=report,
+                                       show_manager=money_shift.manager, show_selected_shift=money_shift.selected_shift,
+                                       total_hours=money_shift.total_hours, total_cash=money_shift.total_cash,
+                                       total_credit=money_shift.total_credit, cash_per_hour=money_shift.cash_per_hour,
+                                       credit_per_hour=money_shift.credit_per_hour, total_tip=money_shift.total_tip,
+                                       id=counter_w, name=waiter_model.waiters_name,
+                                       start_time=waiter_model.start_time_waiter_list,
+                                       finish_time=waiter_model.finish_time_waiter_list,
+                                       total_waiter_time=waiter_model.total_waiter_time_list,
+                                       total_cash_waiter=waiter_model.cash_waiter_list,
+                                       total_credit_waiter=waiter_model.credit_waiter_list,
+                                       total_tips=waiter_model.all_tips_waiters_list)
 
     if report == "detail-not exist":
         flash(" Didn't found a shift")
