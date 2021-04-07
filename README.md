@@ -4,7 +4,7 @@ at the end of each day we would calculate the tips in a binder,
 and i tried to change the process to be more easy
 * Calculate tips for all the waiters in my restaurant.
 * for to refresh click on the buttom "Home"
-* NEW BUTTON - Search the shift  in the database
+* To Search the shift  in the database click on the buttom "Search Shift"
 
 ![example_tips_jems](https://github.com/dvirtayeb/Jems/blob/master/example_tips_jems.png)
 
