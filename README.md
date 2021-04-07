@@ -6,5 +6,3 @@ and i tried to change the process to be more easy
 * for to refresh click on the buttom "Home"
 * NEW BUTTON - Search the shift  in the database
 
-
-![example_tips](https://github.com/dvirtayeb/Jems/blob/master/example_tips.png)
