@@ -7,5 +7,4 @@ and i tried to change the process to be more easy
 * NEW BUTTON - Search the shift  in the database
 
 
-
 ![example_tips](https://github.com/dvirtayeb/Jems/blob/master/example_tips.png)
