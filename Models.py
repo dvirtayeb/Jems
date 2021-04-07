@@ -124,7 +124,7 @@ class WaitersTable(Program.db.Model):
     total_credit_waiter = Column('T-Credit-waiter', Float, nullable=True)
     total_tip_waiter = Column('Total-money', Float, nullable=True)
     shift_id = Column('shift_id', Integer)
-    time_zero = datetime(1, 1, 1).time()
+    time_zero = datetime(1, 1, 1).time().strftime("%H:%M:%S")
     waiters = []
     waiters_name = []
     start_time_waiter_list = []
