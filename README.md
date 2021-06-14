@@ -4,6 +4,7 @@ The main purpose:
 in 2018-2019 at the end of each day,
 we would calculate the tips in a binder
 and i tried to change the process to be more easy, so i created this side project.
+Still working on this project between my academic study.
 
 About the website:
 * Basic Website with simple features for easy orientation.
@@ -22,7 +23,6 @@ Implementation:
 * HTML
 * CSS
 * SQLITE
-
 
 
 ![example_tips_jems](https://github.com/dvirtayeb/Jems/blob/master/example_tips_jems.png)
