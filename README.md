@@ -1,6 +1,6 @@
 # Jems
 The main purpose:
-I Work in "Jems Beer" resturant as a Bartender,
+* I Work in "Jems Beer" resturant as a Bartender,
 in 2018-2019 at the end of each day, we would calculate the tips in a binder
 and i tried to change the process to be more easy.
 
