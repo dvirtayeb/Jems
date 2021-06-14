@@ -9,3 +9,5 @@ and i tried to change the process to be more easy
 ![example_tips_jems](https://github.com/dvirtayeb/Jems/blob/master/example_tips_jems.png)
 
 ![Search_shift](https://github.com/dvirtayeb/Jems/blob/master/Search_shift.png)
+
+![After_search](https://github.com/dvirtayeb/Jems/blob/master/After_search.png)
