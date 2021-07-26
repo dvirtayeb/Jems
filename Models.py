@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 
 from django.db.models.expressions import Col
 
@@ -6,25 +6,7 @@ import Program
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time, Float, Date, select
 
 
-# model for db:
-class BaseModel(Program.db.Model):
-    __abstract__ = True
-    
-    def save(self):
-        if self not in Program.db.session:
-            Program.db.session.add(self)
-        Program.db.session.commit()
-
-    def update(self, data: dict):
-        for field, value in data.items():
-            setattr(self, field, value)
-        self.save()
-
-    def delete(self):
-        Program.db.session.delete(self)
-        Program.db.session.commit()
-
-
+# Waiter Model
 class Waiters(Program.db.Model):
     __table_name__ = 'waiters'
     id = Column('ID', Integer, primary_key=True)
@@ -42,6 +24,7 @@ class Waiters(Program.db.Model):
         self.location = location
 
 
+# Money Model
 class Money(Program.db.Model):
     __table_name__ = 'money'
     id = Column('id_money', Integer, primary_key=True)
@@ -113,6 +96,7 @@ class Money(Program.db.Model):
                     self.cash_per_hour, self.credit_per_hour, self.total_tip)
 
 
+# Waiter Table Model
 class WaitersTable(Program.db.Model):
     __table_name__ = 'waiters_table'
     id_waiter = Column('id', Integer, primary_key=True, nullable=True)
@@ -124,7 +108,7 @@ class WaitersTable(Program.db.Model):
     total_credit_waiter = Column('T-Credit-waiter', Float, nullable=True)
     total_tip_waiter = Column('Total-money', Float, nullable=True)
     shift_id = Column('shift_id', Integer)
-    time_zero = datetime(1, 1, 1).time().strftime("%H:%M:%S")
+    time_zero = datetime.strptime("00:00:00", "%H:%M:%S").time()
     waiters = []
     waiters_name = []
     start_time_waiter_list = []
@@ -145,7 +129,6 @@ class WaitersTable(Program.db.Model):
         self.total_credit_waiter = total_credit_waiter
         self.total_tip_waiter = total_tip_waiter
         self.shift_id = shift_id
-        self.waiters_name = []
 
     def get_name(self):
         return self.name
@@ -171,10 +154,21 @@ class WaitersTable(Program.db.Model):
     def set_start_time_zero(self):
         if self.start_time_waiter == '':
             self.start_time_waiter = self.time_zero
+        else:
+            try:
+                self.start_time_waiter = datetime.strptime(self.start_time_waiter, '%H:%M').time()
+
+            except ValueError:
+                self.start_time_waiter = datetime.strptime(self.start_time_waiter, '%H:%M:%S').time()
 
     def set_finish_time_zero(self):
         if self.finish_time_waiter == '':
             self.finish_time_waiter = self.time_zero
+        else:
+            try:
+                self.finish_time_waiter = datetime.strptime(self.finish_time_waiter, '%H:%M').time()
+            except ValueError:
+                self.finish_time_waiter = datetime.strptime(self.finish_time_waiter, '%H:%M:%S').time()
 
     def set_total_time_waiter_zero(self):
         if self.total_waiter_time == '':
@@ -197,6 +191,7 @@ class WaitersTable(Program.db.Model):
             self.waiters_name.append(self.name)
 
     def calculate_tip_each_waiter(self, shift):
+        print(self.total_waiter_time)
         if self.total_waiter_time != 0:
             self.total_cash_waiter = round(float(self.total_waiter_time) * float(shift.cash_per_hour), 1)
             self.cash_waiter_list.append(self.total_cash_waiter)
@@ -229,9 +224,9 @@ class WaitersTable(Program.db.Model):
         self.add_to_list_total_waiter()
         self.waiters.append(waiter)
 
-    # "to String":
+    # "To String":
     def __repr__(self):
-        return '<waiters:id:{}, name: {}, start time: {}, end time: {}, total time: {},' \
+        return 'waiters:id:{}, name: {}, start time: {}, end time: {}, total time: {},' \
                ' total cash waiter: {}, total credit waiter:{}, total tip:{}, shift ID: {}\n'\
             .format(self.id_waiter, self.name, self.start_time_waiter, self.finish_time_waiter,
                     self.total_waiter_time, self.total_cash_waiter, self.total_credit_waiter, self.total_tip_waiter,
