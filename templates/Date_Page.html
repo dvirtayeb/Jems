@@ -8,7 +8,7 @@
 <body>
 {% extends "base.html" %}
 {% block content %}
-    <div class="dates">
+    <div class="Search_shifts">
         <form method="POST">
             <h1>Search Shift</h1>
             <ul class="vars_input">
@@ -20,18 +20,19 @@
             </ul>
             <br>
             <h3><input class="show_submit" type="submit" name="Show_Submit" value="Search"></h3>
-            {% if report == "detail-not exist" %}
-            <div style="display: none;">
-            {% elif report == "detail-exist" %}
+            {% if report_details == "detail-not exist" %}
+            <div style="display: none;"></div>
+            {% elif report_details == "detail-exist" %}
             <div style="display: block;">
-                <br></br>
+                <table>
+                <br>
                 <h1> -------------------- Shift -------------------- </h1>
                 <ul>
                     <li><a href="#">Date:   <input name="show_date" type="date" value="{{show_date}}" disabled></a></li>
                 <li><a>Manager:   {{show_manager}} </a> </li>
                 <li><a>Shift:   {{show_selected_shift}} </a></li>
                 </ul>
-                <table>
+                <br>
                     <tr>
                          <td> </td>
                         <td><b> סה"כ שעות</b></td>
@@ -73,10 +74,10 @@
                     <td> {{total_tips[loop.index0]}} </td>
                 </tr>
                 {% endfor %} {% else %}
-                    <br>
-            {% endif %}
                 </table>
+                <br>
             </div>
+                {% endif %}
         </form>
     </div>
 {% endblock %}
