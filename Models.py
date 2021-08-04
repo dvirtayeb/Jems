@@ -72,7 +72,7 @@ class Money(Program.db.Model):
             self.total_credit = 0
 
     def set_total_tips(self):
-        self.total_tip = self.cash_per_hour + self.credit_per_hour
+        self.total_tip = round(self.cash_per_hour + self.credit_per_hour, 3)
 
     def calculate_cash_per_hour(self):
         self.cash_per_hour = round(float(self.total_cash) / self.total_hours, 1)
@@ -191,7 +191,6 @@ class WaitersTable(Program.db.Model):
             self.waiters_name.append(self.name)
 
     def calculate_tip_each_waiter(self, shift):
-        print(self.total_waiter_time)
         if self.total_waiter_time != 0:
             self.total_cash_waiter = round(float(self.total_waiter_time) * float(shift.cash_per_hour), 1)
             self.cash_waiter_list.append(self.total_cash_waiter)

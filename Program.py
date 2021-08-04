@@ -13,8 +13,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}\\dataBase\\jems_db.db'.format(os.getcwd())  # db file
 db = SQLAlchemy(app)  # Database
-migrate = Migrate(app, db)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# migrate = Migrate(app, db)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # disable the modification tracking system in Flask-SQLAlchemy
 
 
 @app.route('/form_waiter1/', methods=['GET', 'POST'])
@@ -42,58 +42,29 @@ def about():
     return render_template('About_jems_tips.html')
 
 
-@app.route('/')
-def jems_beer():
-    waiter = WaitersTable
-    money = Money
-    time_zero = datetime(1, 1, 1).time()
-    money.total_cash = 0
-    money.total_credit = 0
-    money.cash_per_hour = ''
-    money.credit_per_hour = ''
-    money.total_tip = ''
-    waiter.name = ''
-    waiter.total_waiter_time = 0
-    waiter.start_time_waiter = time_zero
-    waiter.finish_time_waiter = time_zero
-    waiter.cash_waiter_list = []
-    waiter.credit_waiter_list = []
-    waiter.all_tips_waiters_list = []
-    return render_template("jems-tips1.html", waiters=[], name='', start_time='', finish_time='',
-                           total_waiter_time='', total_cash_waiter='', total_credit_waiter='',
-                           total_tips='')
-
-
 @app.route('/', methods=['POST', 'GET'])
-def jems_beer_update():
+def jems_beer_calculate_page():
     # Create Models
     waiter = WaitersTable
     shift = Money
     date = None  # Default
     if request.method == 'POST':
-        # Request the data from the page:
-        # Data of First Table: Money
-        date = request.form.get('date_shift')
-        manager = request.form.get('manager')
-        selected_shift = request.form.get('shift')
-        total_cash = request.form.get('total_cash')
-        total_credit = request.form.get('total_credit')
-        total_tip = 0
-        total_hours = 0
-        cash_per_hour = 0
-        credit_per_hour = 0
-        # Data of Second table: Waiters
-        names = request.form.getlist('name')
-        start_time_waiter = request.form.getlist('start_time')
-        finish_time_waiter = request.form.getlist('finish_time')
-        total_waiter_time = request.form.getlist('total_time')
-        total_cash_waiter = 0
-        total_credit_waiter = 0
-        total_tip_waiter = 0
+        # Request the data of first table: Money
+        shift_dict = {"date": request.form.get('date_shift'), "manager": request.form.get('manager'),
+                      "selected_shift": request.form.get('shift'), "total_cash": request.form.get('total_cash'),
+                      "total_credit": request.form.get('total_credit'), "total_tip": 0, "total_hours": 0,
+                      "cash_per_hour": 0, "credit_per_hour": 0}
+        # Request the data of first table: WaiterTable
+        waiters_dict = {"names": request.form.getlist('name'), "start_time_Waiter": request.form.getlist('start_time'),
+                        "finish_time_waiter": request.form.getlist('finish_time'),
+                        "total_waiter_time": request.form.getlist('total_time'), "total_cash_waiter": 0,
+                        "total_credit_waiter": 0, "total_tip_waiter": 0}
 
         # INIT : The Money in the shift
-        shift = Money(date, manager, selected_shift, total_hours, total_cash, total_credit, cash_per_hour,
-                      credit_per_hour, total_tip)
+        shift = Money(shift_dict["date"], shift_dict["manager"], shift_dict["selected_shift"],
+                      shift_dict["total_hours"], shift_dict["total_cash"], shift_dict["total_credit"],
+                      shift_dict["cash_per_hour"],
+                      shift_dict["credit_per_hour"], shift_dict["total_tip"])
         shift.init_cash_credit_money()
         if shift.date != "":
             shift.date = datetime.fromisoformat(shift.date)
@@ -111,28 +82,32 @@ def jems_beer_update():
         last_waiter_id_db = query_max_waiter_id.scalar() or 1
 
         # INIT : The Waiters
-        for i in range(len(names)):
+        for i in range(len(waiters_dict.get("names"))):
             last_waiter_id_db = last_waiter_id_db + 1
             waiter = WaitersTable(
-                last_waiter_id_db, names[i], start_time_waiter[i], finish_time_waiter[i], total_waiter_time[i],
-                total_cash_waiter, total_credit_waiter, total_tip_waiter, last_id_money_db + 1)
+                last_waiter_id_db, waiters_dict["names"][i], waiters_dict["start_time_Waiter"][i],
+                waiters_dict["finish_time_waiter"][i], waiters_dict["total_waiter_time"][i],
+                waiters_dict["total_cash_waiter"], waiters_dict["total_credit_waiter"],
+                waiters_dict["total_tip_waiter"], last_id_money_db + 1)
             waiter.init_waiter(waiter, shift)
 
         # Update the last MAX ID for "waiters ID"
         last_waiter_id_db = query_max_waiter_id.scalar()
 
         # Calculate the Money table and Waiters table:
-        calculate_all_data(shift, waiter, names)
+        calculateTipPageData(shift, waiter, waiters_dict["names"])
 
         # SEND TO DB (database,"DB Browser (SQLite)"):
         update_db(shift_exist, shift, waiter, last_waiter_id_db, last_id_money_db)
     # send to html:
+    else:
+        init_start_page(shift, waiter)
 
     return render_template('Jems-tips1.html', date_shift=date, manager=shift.manager,
                            selected_shift=shift.selected_shift, total_hours=shift.total_hours,
                            total_cash=shift.total_cash, total_credit=shift.total_credit,
                            cash_per_hour=shift.cash_per_hour,
-                           credit_per_hour=shift.credit_per_hour, total_tip=round(shift.total_tip, 3),
+                           credit_per_hour=shift.credit_per_hour, total_tip=shift.total_tip,
                            name=waiter.waiters_name, start_time=waiter.start_time_waiter_list,
                            finish_time=waiter.finish_time_waiter_list, total_waiter_time=waiter.total_waiter_time_list,
                            total_cash_waiter=waiter.cash_waiter_list, total_credit_waiter=waiter.credit_waiter_list,
@@ -194,6 +169,24 @@ def show_date_tips_page():
     return render_template('Date_Page.html', show_date=show_date, report_details=report_details)
 
 
+def init_start_page(money, waiter):
+    time_zero = datetime(1, 1, 1).time()
+    money.manager = ''
+    money.total_cash = ''
+    money.total_credit = ''
+    money.total_hours = ''
+    money.cash_per_hour = ''
+    money.credit_per_hour = ''
+    money.total_tip = ""
+    waiter.name = ''
+    waiter.total_waiter_time = 0
+    waiter.start_time_waiter = time_zero
+    waiter.finish_time_waiter = time_zero
+    waiter.cash_waiter_list = []
+    waiter.credit_waiter_list = []
+    waiter.all_tips_waiters_list = []
+
+
 # Insert into the Waiter Model lists #
 def insert_waiter(waiter_model, waiter):
     waiter_model.waiters_name.append(waiter.name)
@@ -216,11 +209,11 @@ def init_waiter_model(waiter_model):
     waiter_model.all_tips_waiters_list = []
 
 
-def calculate_all_data(shift, waiter, names):
+def calculateTipPageData(shift, waiter, names):
     # Money Table: Calculate the cash per hour, credit per hour, total tip:
     if shift.total_hours > 0:
         shift.calculate_money()
-    shift.total_tip = shift.cash_per_hour + shift.credit_per_hour
+    shift.total_tip = round(shift.cash_per_hour + shift.credit_per_hour, 3)
     # Waiters Table: Calculate the cash and credit for each waiter:
     for i in range(len(names)):
         waiter.waiters[i].calculate_tip_each_waiter(shift)
