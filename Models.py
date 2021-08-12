@@ -1,5 +1,5 @@
 from datetime import datetime, time
-
+from flask_login import UserMixin
 from django.db.models.expressions import Col
 
 import Program
@@ -7,21 +7,36 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time,
 
 
 # Waiter Model
-class Waiters(Program.db.Model):
-    __table_name__ = 'waiters'
+class Waiter(UserMixin, Program.db.Model):
+    __table_name__ = 'waiter'
     id = Column('ID', Integer, primary_key=True)
-    waiter_name = Column('Name', String(20), nullable=True)
+    email = Column('Email', String(30), nullable=False)
+    waiter_name = Column('Name', String(20), nullable=False)
+    password = Column('Password', String(20), nullable=False)
     job_name = Column('Job_Name', String(20), nullable=True)
     age = Column('Age', Integer, nullable=True)
     location = Column('Location', String(20), nullable=True)
     phone = Column('Phone', String(20), nullable=True)
 
-    def __init__(self, waiter_name, job_name, age, phone, location):
+    def __init__(self, email, waiter_name, password, job_name, age, phone, location):
+        self.email = email
         self.waiter_name = waiter_name
+        self.password = password
         self.job_name = job_name
         self.age = age
         self.phone = phone
         self.location = location
+
+    # def is_authenticated(self):
+
+    # def is_active(self):
+
+    # def is_anonymous(self):
+
+    # def get_id(self):
+
+    def __repr__(self):
+        return "{}".format(self.waiter_name)
 
 
 # Money Model

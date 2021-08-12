@@ -70,9 +70,13 @@ table, td, th {
   }
   
   li {
+    display: block;
     float: center;
     border-left: 7px solid rgb(74, 168, 137);
     margin: 0 auto;
+    text-align: center;
+    padding: 20px;
+    text-decoration: none;
   }
   
   li a {
@@ -84,8 +88,9 @@ table, td, th {
     text-decoration: none;
   }
 
-  li a:hover:not(.active) {
-    background-color:  rgb(240, 240, 240);
+  li:hover:not(.active) {
+    background-color:  rgb(74, 168, 137);
+    background-opacity: 50%;
   }
   .active {
     background-color: rgb(0, 168, 112);
@@ -108,23 +113,41 @@ table, td, th {
     justify-content: center;
 }
 
-/* Form page: */
+/* sign up page: */
 
-.form {
+.signup {
   margin: 0 auto;
   text-align: center;
   padding: 20px;
+  width: 40%;
 }
 
-.form p {
+.singup p {
   padding: 10px;
   display: block;
 }
 
-.form textfield {
+.singup textfield {
   padding: 15px;
   margin-right: 10px;
   display: inline-table;
+}
+
+.singup submit {
+margin: 0 auto;
+    margin: 0 auto;
+    height: 40px;
+    width: 150px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Login page */
+.login_page {
+  width: 40%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
 }
 
 /* About page: */
