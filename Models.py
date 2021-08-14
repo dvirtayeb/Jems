@@ -1,31 +1,50 @@
 from datetime import datetime, time
-
+from flask_login import UserMixin
 from django.db.models.expressions import Col
-
-import Program
+from Program import db, login_manager
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Time, Float, Date, select
 
 
+# @login_manager.user_loader()
+# def load_user(user_id):
+#     return Waiter.query.get(int(user_id))
+
+
 # Waiter Model
-class Waiters(Program.db.Model):
-    __table_name__ = 'waiters'
+class Waiter(UserMixin, db.Model):
+    __table_name__ = 'waiter'
     id = Column('ID', Integer, primary_key=True)
-    waiter_name = Column('Name', String(20), nullable=True)
+    email = Column('Email', String(30), nullable=False)
+    waiter_name = Column('Name', String(20), nullable=False)
+    password = Column('Password', String(20), nullable=False)
     job_name = Column('Job_Name', String(20), nullable=True)
     age = Column('Age', Integer, nullable=True)
     location = Column('Location', String(20), nullable=True)
     phone = Column('Phone', String(20), nullable=True)
 
-    def __init__(self, waiter_name, job_name, age, phone, location):
+    def __init__(self, email, waiter_name, password, job_name, age, phone, location):
+        self.email = email
         self.waiter_name = waiter_name
+        self.password = password
         self.job_name = job_name
         self.age = age
         self.phone = phone
         self.location = location
 
+    # def is_authenticated(self):
+
+    # def is_active(self):
+
+    # def is_anonymous(self):
+
+    # def get_id(self):
+
+    def __repr__(self):
+        return "{}".format(self.waiter_name)
+
 
 # Money Model
-class Money(Program.db.Model):
+class Money(db.Model):
     __table_name__ = 'money'
     id = Column('id_money', Integer, primary_key=True)
     date = Column('date', Date, nullable=False)
@@ -97,7 +116,7 @@ class Money(Program.db.Model):
 
 
 # Waiter Table Model
-class WaitersTable(Program.db.Model):
+class WaitersTable(db.Model):
     __table_name__ = 'waiters_table'
     id_waiter = Column('id', Integer, primary_key=True, nullable=True)
     name = Column('Name', String, nullable=True)

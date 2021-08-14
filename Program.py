@@ -1,9 +1,13 @@
-from flask import Flask, render_template, url_for, request, flash, redirect
+
+from flask import Flask, render_template, url_for, request, flash, redirect, g, abort
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
-from datetime import datetime
 import os
-from Forms import WaiterForm
+from urllib.parse import urlparse, urljoin
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from Forms import WaiterSignupForm, WaiterLoginForm
 from flask_migrate import Migrate
 from Models import *
 
@@ -13,28 +17,93 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}\\dataBase\\jems_db.db'.format(os.getcwd())  # db file
 db = SQLAlchemy(app)  # Database
+
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
+
+login_manager.init_app(app)
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+
+@login_manager.user_loader
+def load_user(user_id):  # since the user_id is just the primary key of our user table, use it in the query for the user
+    return Waiter.query.get(int(user_id))
+
+
 # migrate = Migrate(app, db)
+#     @wraps(func)
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # disable the modification tracking system in Flask-SQLAlchemy
 
 
-@app.route('/form_waiter1/', methods=['GET', 'POST'])
-def form_new_waiter():
-    waiter_form = WaiterForm()
-    new_waiter = [Waiters(waiter_name=waiter_form.waiter_name.data, job_name=waiter_form.job_name.data,
-                          age=waiter_form.age.data, location=waiter_form.location.data,
-                          phone=waiter_form.phone.data)]
-    if waiter_form.validate_on_submit():
-        flash('The waiter has registered successfully')
-        # add to db:
-        for w in new_waiter:
-            db.session.add(w)
-        db.session.commit()
-        return redirect(url_for('form_new_waiter'))
-    if waiter_form.waiter_name.data == "":
-        flash("You didn't insert a name!")
-    if waiter_form.job_name.data == "":
-        flash("You didn't insert a job name!")
-    return render_template('form_waiter1.html', form=waiter_form)
+@app.route('/Signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('jems_beer_calculate_page'))
+    waiter_form = WaiterSignupForm()
+    if request.method == 'POST':
+        if waiter_form.auth.data == "password-admin":
+            print(waiter_form.validate_on_submit())
+            if waiter_form.validate_on_submit():
+                newUser = Waiter(email=waiter_form.email.data, waiter_name=waiter_form.waiter_name.data,
+                                 password=generate_password_hash(waiter_form.password.data, method='sha256'),
+                                 job_name=waiter_form.job_name.data, age=waiter_form.age.data,
+                                 phone=waiter_form.phone.data, location=waiter_form.location.data)
+                user = db.session.query(Waiter).filter_by(name=newUser.waiter_name).first()
+                if user is not None:
+                    flash("user Name already exists")
+                    return redirect(url_for('signup'))
+                user = db.session.query(Waiter).filter_by(email=newUser.email).first()
+                if user is not None:
+                    flash("Email address already exists")
+                    return redirect(url_for('signup'))
+                db.session.add(newUser)
+                db.session.commit()
+                flash("Registration Successful!")
+                return redirect(url_for('login'))
+        else:
+            flash("Auth Password is not Correct!")
+    return render_template('Sign_up.html', form=waiter_form)
+
+
+@app.route('/Login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('jems_beer_calculate_page'))
+    formLogin = WaiterLoginForm()
+    if request.method == 'POST':
+        user = db.session.query(Waiter).filter_by(email=formLogin.email.data).first()
+        if not user or not check_password_hash(user.password, formLogin.password.data):
+            flash('Please check your login details and try again')
+            return redirect(url_for('login'))
+        if formLogin.validate_on_submit():
+            flash("Logged in successfully.")
+            login_user(user)
+            next_page = request.args.get('next')
+            if not is_safe_url(next_page):
+                return abort(400)
+            return redirect(next_page) if next_page else redirect(url_for('jems_beer_calculate_page'))
+
+    return render_template('Login.html', form=formLogin)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+@app.route('/Account')
+@login_required
+def account():
+    return render_template('Account.html')
 
 
 @app.route('/about/')
@@ -43,6 +112,7 @@ def about():
 
 
 @app.route('/', methods=['POST', 'GET'])
+@login_required
 def jems_beer_calculate_page():
     # Create Models
     waiter = WaitersTable
@@ -103,7 +173,8 @@ def jems_beer_calculate_page():
     else:
         init_start_page(shift, waiter)
 
-    return render_template('Jems-tips1.html', date_shift=date, manager=shift.manager,
+    return render_template('Jems-tips1.html',
+                           date_shift=date, manager=shift.manager,
                            selected_shift=shift.selected_shift, total_hours=shift.total_hours,
                            total_cash=shift.total_cash, total_credit=shift.total_credit,
                            cash_per_hour=shift.cash_per_hour,
@@ -116,6 +187,7 @@ def jems_beer_calculate_page():
 
 
 @app.route('/Date_Page', methods=['GET', 'POST'])
+@login_required
 def show_date_tips_page():
     counter_w = 0
     report_details = "empty"
@@ -147,12 +219,10 @@ def show_date_tips_page():
                         insert_waiter(waiter_model, waiter)
                     report_details = "detail-exist"
                     return render_template('Date_Page.html', show_date=show_date, shift=shift,
-                                           report_details=report_details,
-                                           show_manager=money_shift.manager,
+                                           report_details=report_details, show_manager=money_shift.manager,
                                            show_selected_shift=money_shift.selected_shift,
                                            total_hours=money_shift.total_hours,
-                                           total_cash=money_shift.total_cash,
-                                           total_credit=money_shift.total_credit,
+                                           total_cash=money_shift.total_cash, total_credit=money_shift.total_credit,
                                            cash_per_hour=money_shift.cash_per_hour,
                                            credit_per_hour=money_shift.credit_per_hour, total_tip=money_shift.total_tip,
                                            id=counter_w, name=waiter_model.waiters_name,
@@ -220,8 +290,7 @@ def calculateTipPageData(shift, waiter, names):
 
 
 def update_db(shift_exist, shift, waiter, last_waiter_id_db, last_id_money_db):
-    # --- Update exist data in the DB --- :
-    if shift_exist is not None:
+    if shift_exist is not None:  # --- Update exist data in the DB --- :
         # Update Money table:
         db.session.query(Money).filter(Money.date == shift.date.strftime("%Y-%m-%d"),
                                        Money.selected_shift == shift.selected_shift).update(
