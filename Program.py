@@ -42,11 +42,6 @@ def load_user(user_id):  # since the user_id is just the primary key of our user
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # disable the modification tracking system in Flask-SQLAlchemy
 
 
-@app.route('/time')
-def get_current_time():
-    return {'time': "12:00"}
-
-
 @app.route('/Signup', methods=['GET', 'POST'])
 def signup():
     if current_user.is_authenticated:
