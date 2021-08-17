@@ -6,16 +6,16 @@ from sqlalchemy import func
 import os
 from urllib.parse import urlparse, urljoin
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import datetime
 from Forms import WaiterSignupForm, WaiterLoginForm
-from flask_migrate import Migrate
+# from flask_migrate import Migrate
 from Models import *
 
 app = Flask(__name__)
 SECRET_KEY = os.environ.get('SECRET_KEY') or '076f2ce915e884096c9ae907479b316e'
 app.config['SECRET_KEY'] = SECRET_KEY
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}\\dataBase\\jems_db.db'.format(os.getcwd())  # db file
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}\\Backend jems\\dataBase\\jems_db.db'.format(os.getcwd())  # db file
 db = SQLAlchemy(app)  # Database
 
 login_manager = LoginManager()
@@ -33,13 +33,18 @@ def is_safe_url(target):
 
 @login_manager.user_loader
 def load_user(user_id):  # since the user_id is just the primary key of our user table, use it in the query for the user
-    return Waiter.query.get(int(user_id))
+    return db.session.query(Waiter).get(int(user_id))
 
 
 # migrate = Migrate(app, db)
 #     @wraps(func)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # disable the modification tracking system in Flask-SQLAlchemy
+
+
+@app.route('/time')
+def get_current_time():
+    return {'time': "12:00"}
 
 
 @app.route('/Signup', methods=['GET', 'POST'])
@@ -93,7 +98,7 @@ def login():
     return render_template('Login.html', form=formLogin)
 
 
-@app.route('/logout')
+@app.route('/Logout')
 @login_required
 def logout():
     logout_user()
@@ -106,12 +111,12 @@ def account():
     return render_template('Account.html')
 
 
-@app.route('/about/')
+@app.route('/About/')
 def about():
     return render_template('About_jems_tips.html')
 
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/CalculateTips', methods=['POST', 'GET'])
 @login_required
 def jems_beer_calculate_page():
     # Create Models
@@ -186,7 +191,7 @@ def jems_beer_calculate_page():
                            )
 
 
-@app.route('/Date_Page', methods=['GET', 'POST'])
+@app.route('/SearchShift', methods=['GET', 'POST'])
 @login_required
 def show_date_tips_page():
     counter_w = 0

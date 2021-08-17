@@ -6,9 +6,6 @@ from werkzeug.security import check_password_hash
 from wtforms import StringField, SubmitField, BooleanField, TimeField, PasswordField
 from wtforms.validators import DataRequired, EqualTo, ValidationError
 
-# import Models
-from model import Waiter
-
 
 class WaiterSignupForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
