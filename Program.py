@@ -165,7 +165,7 @@ def jems_beer_calculate_page():
         last_waiter_id_db = query_max_waiter_id.scalar()
 
         # Calculate the Money table and Waiters table:
-        calculateTipPageData(shift, waiter, waiters_dict["names"])
+        calculate_tip_page_data(shift, waiter, waiters_dict["names"])
 
         # SEND TO DB (database,"DB Browser (SQLite)"):
         update_db(shift_exist, shift, waiter, last_waiter_id_db, last_id_money_db)
@@ -279,7 +279,7 @@ def init_waiter_model(waiter_model):
     waiter_model.all_tips_waiters_list = []
 
 
-def calculateTipPageData(shift, waiter, names):
+def calculate_tip_page_data(shift, waiter, names):
     # Money Table: Calculate the cash per hour, credit per hour, total tip:
     if shift.total_hours > 0:
         shift.calculate_money()
