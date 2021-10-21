@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jems-tips.css') }}">
+    <title>Pick Date</title>
+</head>
+<body>
+{% extends "base.html" %}
+{% block content %}
+    <div class="Search_shifts">
+        <form method="POST">
+            <h1>Search Shift</h1>
+            <ul class="vars_input">
+            <li><a href="#"><h4>Pick a Date:</h4><input name="show_date" type="date" value="{{show_date}}"></a></li>
+            <li><a href="#"><label for="shift">Select Shift:  <select class="button" name="shift" id="shift">
+                        <option value="morning" id="morning"> משמרת בוקר </option>
+                        <option value="evening" id="evening">  משמרת ערב </option>
+            </select></label></a></li>
+            </ul>
+            <br>
+            <h3><input class="show_submit" type="submit" name="Show_Submit" value="Search"></h3>
+            {% if report_details == "detail-not exist" %}
+            <div style="display: none;"></div>
+            {% elif report_details == "detail-exist" %}
+            <div style="display: block;">
+                <table>
+                <br>
+                <h1> -------------------- Shift -------------------- </h1>
+                <ul>
+                    <li><a href="#">Date:   <input name="show_date" type="date" value="{{show_date}}" disabled></a></li>
+                <li><a>Manager:   {{show_manager}} </a> </li>
+                <li><a>Shift:   {{show_selected_shift}} </a></li>
+                </ul>
+                <br>
+                    <tr>
+                         <td> </td>
+                        <td><b> סה"כ שעות</b></td>
+                        <td><b> סה"כ מזומן</b></td>
+                        <td><b> סה"כ אשראי</b></td>
+                        <td><b> מזומן לשעה  </b></td>
+                        <td><b> אשראי לשעה  </b></td>
+                        <td><b> סה"כ טיפ</b></td>
+                    </tr>
+                    <tr>
+                        <td>#</td>
+                        <td> {{total_hours}} </td>
+                        <td> {{total_cash}} </td>
+                        <td> {{total_credit}} </td>
+                        <td> {{cash_per_hour}} </td>
+                        <td> {{credit_per_hour}} </td>
+                        <td> {{total_tip}}</td>
+                    </tr>
+                    <!-- Title for Waiters-->
+                    <tr>
+                        <td> </td>
+                        <td><b> מלצר\ברמן: </b></td>
+                        <td><b> שעת התחלה:  </b></td>
+                        <td><b> שעת סיום:  </b></td>
+                        <td><b> שעות:  </b></td>
+                        <td><b> מזומן:  </b></td>
+                        <td><b> אשראי:  </b></td>
+                        <td><b> סה"כ:  </b> </td>
+                    </tr>
+                {% for i in range(12) %}
+                <tr>
+                    <td>{{i+1}}</td>
+                    <td> {{ name[loop.index0] }} </td>
+                    <td> {{ start_time[loop.index0] }}</td>
+                    <td> {{ finish_time[loop.index0] }} </td>
+                    <td> {{total_waiter_time[loop.index0]}} </td>
+                    <td> {{total_cash_waiter[loop.index0]}} </td>
+                    <td> {{total_credit_waiter[loop.index0]}} </td>
+                    <td> {{total_tips[loop.index0]}} </td>
+                </tr>
+                {% endfor %} {% else %}
+                </table>
+                <br>
+            </div>
+                {% endif %}
+        </form>
+    </div>
+{% endblock %}
+</body>
+</html>

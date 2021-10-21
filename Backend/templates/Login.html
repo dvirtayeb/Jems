@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jems-tips.css') }}">
+</head>
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    <div class = "login_page">
+        <form class ="login" action="" method="POST">
+            <h1> Login Page</h1>
+            <div class="form_login">
+                <li>Email: {{ form.email}}</li>
+                <br>
+                <li>Name: {{ form.waiter_name }}</li>
+                <br>
+                <li>Password: {{ form.password }}</li>
+                <br>
+            </div>
+            {{ form.csrf_token }}
+<!--            <h3>{{form.submit}}</h3>-->
+            <h3><input class="submit" type="submit" name="Submit" value="Submit"></h3>
+        </form>
+    </div>
+{% endblock %}
+</body>
+
+</html>

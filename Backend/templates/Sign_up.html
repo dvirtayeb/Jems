@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up Waiter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jems-tips.css') }}">
+</head>
+<body>
+{% extends "base.html" %}
+<div>
+    {% block content %}
+    <div class="signup">
+        <form method="POST" action="">
+            <h1>Sign Up- Registry</h1>
+            {{ form.csrf_token }}
+            <br>
+            <div class="form_signup">
+                <li>Email: {{ form.email}}</li>
+                <br>
+                <li>Name: {{ form.waiter_name }}</li>
+                <br>
+                <li>Password: {{ form.password }}</li>
+                <br>
+                <li>Re enter password: {{ form.confirm }}</li>
+                <br>
+                <li>Age: {{ form.age }}</li>
+                <br>
+                <li>Phone: {{ form.phone }}</li>
+                <br>
+                <li>location: {{ form.location }}</li>
+                <br>
+                <li>Role: {{ form.job_name}}</li>
+                <br>
+                <li>Auth Password: {{ form.auth }}</li>
+            </div>
+            <br>
+            <h3><input class="submit" type="submit" name="Submit" value="Submit"></h3>
+            <br>
+        </form>
+    </div>
+    {% endblock %}
+    </div>
+</body>
+</html>
