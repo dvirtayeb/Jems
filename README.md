@@ -24,6 +24,7 @@ Implementation:
 * HTML
 * CSS
 * SQLITE
+* React (version 2 - another branch)
 
 
 ![example_tips_jems](https://github.com/dvirtayeb/Jems/blob/master/example_tips_jems.png)
