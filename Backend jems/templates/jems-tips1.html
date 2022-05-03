@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Jems-Tips</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="#">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jems-tips.css') }}">
+    </head>
+    <body>
+    {% extends "base.html" %}
+    {% block content %}
+        <div class="home">
+            <form method="POST">
+        <!--Bar--><div class="bar_header">
+                <ul>
+                    <li>Date: <input name="date_shift" type="date" value="{{date_shift}}"></li>
+                    <li>Manager: <input name="manager" type="text" id="manager" value="{{manager}}" placeholder="Name"></li>
+                    <li>Select Shift:  <select class="button" name="shift" >
+                        <option value="morning"> משמרת בוקר </option>
+                        <option value="evening">  משמרת ערב </option>
+                    </select></li>
+                </ul>
+            </div>
+        <br>
+        <!--total-Table--><div class="table">
+            <table>
+                <tr>
+                    <td> </td>
+                    <td><b> סה"כ שעות</b></td>
+                    <td><b> סה"כ מזומן</b></td>
+                    <td><b> סה"כ אשראי</b></td>
+                    <td><b> מזומן לשעה  </b></td>
+                    <td><b> אשראי לשעה  </b></td>
+                    <td><b> סה"כ טיפ</b></td>
+
+
+                </tr>
+                <div>
+                <tr>
+                    <td>#</td>
+                    <td> {{total_hours}} </td>
+                    <td><input type="float" id="Total-Cash" name="total_cash" placeholder="Total Cash" value="{{total_cash}}"> </td>
+                    <td><input type="float" id="Total-Credit" name="total_credit" placeholder="Total Credit" value="{{total_credit}}"> </td>
+                    <td> {{cash_per_hour}} </td>
+                    <td> {{credit_per_hour}} </td>
+                    <td> {{total_tip}}</td>
+
+                </tr>
+                </div>
+            </table>
+                <br>
+
+        </div>
+        <br>
+        <!--waiters-Table--><div>
+            <table>
+                <!-- Title for Waiters-->
+                <tr>
+                    <td> </td>
+                    <td><b> מלצר\ברמן: </b></td>
+                    <td><b> שעת התחלה:  </b></td>
+                    <td><b> שעת סיום:  </b></td>
+                    <td><b> שעות:  </b></td>
+                    <td><b> מזומן:  </b></td>
+                    <td><b> אשראי:  </b></td>
+                    <td><b> סה"כ:  </b> </td>
+                </tr>
+                {% for i in range(12) %}
+                <tr>
+                    <td>{{i+1}}</td>
+                    <td>
+                        <input type="text" id="name{{i+1}}" name="name" placeholder="Name"
+                               value="{{ name[loop.index0] }}"> </td>
+                    <td>
+                        <input type="time" id="start_time{{i+1}}" name="start_time" placeholder="Start"
+                               value="{{start_time[loop.index0]}}"> </td>
+                    <td>
+                        <input type="time" id="finish_time{{i+1}}" name="finish_time" placeholder="Finish"
+                               value="{{finish_time[loop.index0]}}"> </td>
+                    <td>
+                        <input type="float" id="total_time{{i+1}}" name="total_time" placeholder="Time"
+                               value="{{total_waiter_time[loop.index0]}}"> </td>
+                    <td> {{total_cash_waiter[loop.index0]}} </td>
+                    <td> {{total_credit_waiter[loop.index0]}} </td>
+                    <td> {{total_tips[loop.index0]}} </td>
+
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+            <br>
+            <h3><input class="submit" type="submit" name="Submit" value="Submit" ></h3>
+            </form>
+        </div>
+
+    {% endblock %}
+    </body>
+</html>
