@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "Frontend jems/react-jems/",
+			"problemMatcher": [],
+			"label": "npm: start - Frontend jems/react-jems",
+			"detail": "react-scripts start"
+		}
+	]
+}

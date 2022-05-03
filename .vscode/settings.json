@@ -1,0 +1,9 @@
+{
+    "compile-hero.disable-compile-files-on-did-save-code": true,
+    "python.testing.pytestArgs": [
+        "Backend jems"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true
+}
