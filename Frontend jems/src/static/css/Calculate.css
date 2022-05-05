@@ -1,0 +1,32 @@
+table{
+    border-collapse: collapse;
+} 
+td, th{
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+ th { 
+    text-align: left;
+    padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+
+.bar_header li {
+    display: block;
+    border-left: 7px solid #8c44ff;
+    padding: 15px;
+  }
+
+.bar_header li:hover:not(.active) {
+    background-color:  #8c44ff57;
+  }
+
+.submit {
+    margin: 0 auto;
+    height: 40px;
+    width: 150px;
+    display: flex;
+    justify-content: center;
+    color: black;
+}
